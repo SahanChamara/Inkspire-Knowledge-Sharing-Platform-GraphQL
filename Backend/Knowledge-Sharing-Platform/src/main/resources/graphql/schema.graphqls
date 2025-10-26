@@ -1,0 +1,32 @@
+#This we can use the define the type of our objects
+type Product {
+    id: ID
+    productName: String
+    description: String
+    price: Int
+    stock: Int
+    category: String
+    imageUrl: String
+}
+
+#This is the query types for like (GET)
+type Query {
+    getProducts: [Product!]!
+    getProductById(id: ID): Product
+}
+
+input ProductInput {
+    productName: String
+    description: String
+    price: Float
+    stock: Int
+    category: String
+    imageUrl: String
+}
+
+# This can be used to add , update,delete methods
+type Mutation {
+    addProduct(input: ProductInput): Product!
+    updateProduct(id: ID!, input: ProductInput): Product
+    deleteProduct(id: ID): Boolean!
+}
