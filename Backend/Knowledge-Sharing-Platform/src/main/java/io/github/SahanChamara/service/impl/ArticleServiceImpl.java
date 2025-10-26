@@ -20,45 +20,4 @@ public class ArticleServiceImpl implements ArticleService {
         private final ModelMapper mapper;
         private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
-    @Override
-    public Product addProduct(Product product) {
-        logger.info("Product object in service {}", product);
-
-        if(product != null){
-            return mapper.map(articleRepository.save(mapper.map(product, ProductEntity.class)), Product.class);
-        }
-        return null;
-    }
-
-    @Override
-    public Product updateProduct(Long id, Product product) {
-        if(id != null && product != null){
-            Optional<ProductEntity> existProduct = articleRepository.findById(id);
-            if(existProduct.isPresent()){
-                return mapper.map(articleRepository.save(mapper.map(product, ProductEntity.class)), Product.class);
-            }
-            throw new IllegalArgumentException("This ID Not Found");
-        }
-        return null;
-    }
-
-    @Override
-    public Boolean deleteProduct(Long id) {
-        if(id != null){
-            Optional<ProductEntity> productExist = articleRepository.findById(id);
-            if(productExist.isPresent()){
-                articleRepository.deleteById(id);
-                return true;
-            }
-            throw new IllegalArgumentException("Id is Not Found");
-        }
-        return false;
-    }
-
-    @Override
-    public List<Product> getAllProducts() {
-        return articleRepository.findAll().stream()
-                .map(productEntity -> mapper.map(productEntity, Product.class))
-                .toList();
-    }
 }

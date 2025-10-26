@@ -1,32 +1,51 @@
-#This we can use the define the type of our objects
-type Product {
-    id: ID
-    productName: String
-    description: String
-    price: Int
-    stock: Int
-    category: String
-    imageUrl: String
+#this is the define an object we used
+
+type Writer {
+    id: ID!
+    name: String!
+    bio: String
+    articles: [Article!]!
 }
 
-#This is the query types for like (GET)
+type Article {
+    id: ID!
+    title: String!
+    content: String
+    status: String!
+    writerId: ID!
+    publishedAt: String
+}
+
+# This is Queries..this is use to GET
 type Query {
-    getProducts: [Product!]!
-    getProductById(id: ID): Product
+    writers: [Writer!]!
+    writerById(id: ID!): Writer
+    articles(status: String): [Article!]!
+    articleById(id: ID!): Article
 }
 
-input ProductInput {
-    productName: String
-    description: String
-    price: Float
-    stock: Int
-    category: String
-    imageUrl: String
+# This is Inputs...this we used to define a Mutation
+input ArticleInput {
+    title: String!
+    content: String
+    writerId: ID!
+    status: String
 }
 
-# This can be used to add , update,delete methods
+input WriterInput {
+    name: String
+    bio: String
+}
+
+# This is Mutation..this we use to POST
 type Mutation {
-    addProduct(input: ProductInput): Product!
-    updateProduct(id: ID!, input: ProductInput): Product
-    deleteProduct(id: ID): Boolean!
+    addWriter(input: WriterInput!): Writer!
+    addArticle(input: ArticleInput!): Article!
+    publishArticle(id: ID!): Article
+    updateArticle(id: ID!, input: ArticleInput!): Article
+    deleteArticle(id: ID!): Boolean!
+}
+
+type Subscription {
+    articlePublished: Article!
 }

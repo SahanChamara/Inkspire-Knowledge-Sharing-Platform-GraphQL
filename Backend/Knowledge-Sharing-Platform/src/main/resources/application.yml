@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/product
+    url: jdbc:mysql://localhost:3306/inkspire
     username: root
     password: 1234
 

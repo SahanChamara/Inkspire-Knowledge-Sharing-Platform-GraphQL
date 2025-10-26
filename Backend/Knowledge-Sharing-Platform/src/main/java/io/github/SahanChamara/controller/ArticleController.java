@@ -20,27 +20,4 @@ public class ArticleController {
     private final ArticleService articleService;
     private static final Logger logger = LoggerFactory.getLogger(ArticleController.class);
 
-    @QueryMapping
-    public List<Product> getProducts() {
-        List<Product> allProducts = articleService.getAllProducts();
-        return allProducts.isEmpty()
-                ? null
-                : allProducts;
-    }
-
-    @MutationMapping
-    public Product addProduct(@Argument("input") Product input){
-        logger.info("Input {}", input);
-        Product inputProduct = new Product(null,input.getProductName(), input.getDescription(), input.getPrice(), input.getStock(), input.getCategory(), input.getImageUrl());
-        logger.info("input Product {}", inputProduct);
-
-        Product product = articleService.addProduct(inputProduct);
-        if(product!=null){
-            return product;
-        }
-        return null;
-    }
-
-    //public record ProductInput(String productName, String description, Float price, Integer stock, String category, String imageUrl) {}
-
 }
