@@ -1,5 +1,6 @@
 package io.github.SahanChamara.controller;
 
+import io.github.SahanChamara.publisher.ArticlePublisher;
 import io.github.SahanChamara.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,5 +20,8 @@ public class ArticleController {
 
     private final ArticleService articleService;
     private static final Logger logger = LoggerFactory.getLogger(ArticleController.class);
+    private final ArticlePublisher articlePublisher;
+
+
 
 }
