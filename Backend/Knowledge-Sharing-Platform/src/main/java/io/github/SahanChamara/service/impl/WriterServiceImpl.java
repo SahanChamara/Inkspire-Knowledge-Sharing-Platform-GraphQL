@@ -5,7 +5,10 @@ import io.github.SahanChamara.entity.WriterEntity;
 import io.github.SahanChamara.repository.WriterRepository;
 import io.github.SahanChamara.service.WriterService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +16,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WriterServiceImpl implements WriterService {
 
     private final WriterRepository writerRepository;
     private final ModelMapper mapper;
+    private static final Logger logger = LoggerFactory.getLogger(WriterServiceImpl.class);
 
     @Override
     @Transactional(readOnly = true)
@@ -40,6 +45,7 @@ public class WriterServiceImpl implements WriterService {
     @Override
     @Transactional
     public Writer addWriter(Writer writer) {
+        logger.info("Service Writer {}", writer);
         if(writer != null){
             return mapper.map(writerRepository.save(mapper.map(writer, WriterEntity.class)), Writer.class);
         }

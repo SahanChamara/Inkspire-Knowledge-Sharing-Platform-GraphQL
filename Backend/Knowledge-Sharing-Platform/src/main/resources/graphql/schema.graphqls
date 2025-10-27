@@ -18,8 +18,8 @@ type Article {
 
 # This is Queries..this is use to GET
 type Query {
-    writers: [Writer!]!
-    writerById(id: ID!): Writer
+    getWriters: [Writer!]!
+    getWriterById(id: ID!): Writer
     articles(status: String): [Article!]!
     articleById(id: ID!): Article
 }
