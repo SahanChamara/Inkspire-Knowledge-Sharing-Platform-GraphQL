@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +26,7 @@ public class ArticleServiceImpl implements ArticleService {
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
     @Override
+    @Transactional
     public Article addArticle(Article article) {
         if(article != null && article.getStatus().equalsIgnoreCase("DRAFT")){
             return mapper.map(articleRepository.save(mapper.map(article, ArticleEntity.class)), Article.class);
@@ -36,6 +38,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional
     public Article publishArticle(Long id) {
         Integer isUpdated = articleRepository.updateStatus(id, "PUBLISHED");
         return isUpdated != 0
@@ -44,26 +47,42 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Article> getAllArticles() {
-        return List.of();
+        return articleRepository.findAll()
+                .stream()
+                .map(articleEntity -> mapper.map(articleEntity, Article.class))
+                .toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Article articleById(Long id) {
-        return null;
+        return mapper.map(articleRepository.findById(id), Article.class);
     }
 
     @Override
+    @Transactional
     public Article updateArticle(Long id, Article article) {
+        if(id != null && article != null){
+            Optional<ArticleEntity> isExist = articleRepository.findById(id);
+            if(isExist.isPresent()){
+                return mapper.map(articleRepository.save(mapper.map(article, ArticleEntity.class)), Article.class);
+            }
+            return null;
+        }
         return null;
     }
 
     @Override
+    @Transactional
     public Boolean deleteArticle(Long id) {
-        return null;
+        articleRepository.deleteById(id);
+        return true;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Map<Long, List<Article>> findArticleByWriterIds(Collection<Long> writerIds) {
         return Map.of();
     }
