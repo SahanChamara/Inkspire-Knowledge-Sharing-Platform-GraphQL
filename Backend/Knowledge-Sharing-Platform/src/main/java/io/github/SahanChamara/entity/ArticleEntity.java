@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "articles")
 @Data
@@ -24,5 +26,7 @@ public class ArticleEntity {
 
     @Column(name = "writerId")
     private Long writerId;
-    private Instant publishedAt;
+
+    @Column(name = "published_at")
+    private LocalDateTime publishedAt;
 }

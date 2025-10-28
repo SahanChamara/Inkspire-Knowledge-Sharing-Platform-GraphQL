@@ -2,6 +2,7 @@ package io.github.SahanChamara.service.impl;
 
 import io.github.SahanChamara.dto.Article;
 import io.github.SahanChamara.entity.ArticleEntity;
+import io.github.SahanChamara.publisher.ArticlePublisher;
 import io.github.SahanChamara.repository.ArticleRepository;
 import io.github.SahanChamara.service.ArticleService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
     private final ModelMapper mapper;
+    private final ArticlePublisher articlePublisher;
     private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
     @Override
@@ -30,18 +34,23 @@ public class ArticleServiceImpl implements ArticleService {
             return mapper.map(articleRepository.save(mapper.map(article, ArticleEntity.class)), Article.class);
         }
 
-        return article != null && article.getStatus().equalsIgnoreCase("PUBLISHED")
+/*        return article != null && article.getStatus().equalsIgnoreCase("PUBLISHED")
                 ? publishArticle(article.getId())
-                : null;
+                : null;*/
+        return null;
     }
 
     @Override
     @Transactional
     public Article publishArticle(Long id) {
-        Integer isUpdated = articleRepository.updateStatus(id, "PUBLISHED");
-        return isUpdated != 0
-                ? mapper.map(articleRepository.findById(id), Article.class)
-                : null;
+        Integer isUpdated = articleRepository.updateStatus(id, "PUBLISHED", LocalDateTime.now(ZoneOffset.UTC));
+        if(isUpdated != 0){
+            Optional<ArticleEntity> articleEntity = articleRepository.findById(id);
+            Article article = mapper.map(articleEntity, Article.class);
+            articlePublisher.publish(article);
+            return article;
+        }
+        return null;
     }
 
     @Override

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -15,5 +16,5 @@ public class Article {
     private String content;
     private String status;
     private Long writerId;
-    private Instant publishedAt;
+    private LocalDateTime publishedAt;
 }
