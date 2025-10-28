@@ -12,10 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -84,6 +82,13 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional(readOnly = true)
     public Map<Long, List<Article>> findArticleByWriterIds(Collection<Long> writerIds) {
-        return Map.of();
+        if(writerIds == null || writerIds.isEmpty()) return Collections.emptyMap();
+        List<ArticleEntity> byWriterIdIn = articleRepository.findByWriterIdIn(writerIds);
+        Map<Long, List<Article>> group = byWriterIdIn.stream()
+                .map(articleEntity -> mapper.map(articleEntity, Article.class))
+                .collect(Collectors.groupingBy(Article::getWriterId));
+
+        writerIds.forEach(id -> group.putIfAbsent(id, List.of()));
+        return  group;
     }
 }
