@@ -30,14 +30,17 @@ public class ArticleServiceImpl implements ArticleService {
             return mapper.map(articleRepository.save(mapper.map(article, ArticleEntity.class)), Article.class);
         }
 
-        return article != null
+        return article != null && article.getStatus().equalsIgnoreCase("PUBLISHED")
                 ? publishArticle(article.getId())
                 : null;
     }
 
     @Override
     public Article publishArticle(Long id) {
-        return null;
+        Integer isUpdated = articleRepository.updateStatus(id, "PUBLISHED");
+        return isUpdated != 0
+                ? mapper.map(articleRepository.findById(id), Article.class)
+                : null;
     }
 
     @Override
