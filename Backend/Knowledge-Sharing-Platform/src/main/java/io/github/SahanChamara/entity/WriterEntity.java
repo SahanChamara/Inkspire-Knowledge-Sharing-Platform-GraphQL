@@ -17,4 +17,10 @@ public class WriterEntity {
 
     @Column(length = 2000)
     private String bio;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "password")
+    private String password;
 }

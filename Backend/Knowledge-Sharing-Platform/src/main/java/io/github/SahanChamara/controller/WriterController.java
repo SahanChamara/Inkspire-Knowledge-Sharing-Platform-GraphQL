@@ -2,6 +2,7 @@ package io.github.SahanChamara.controller;
 
 import io.github.SahanChamara.dto.Writer;
 import io.github.SahanChamara.service.WriterService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -10,21 +11,23 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class WriterController {
 
     private final WriterService writerService;
     private static final Logger logger = LoggerFactory.getLogger(WriterController.class);
 
     @MutationMapping()
-    public Writer addWriter(@Argument("input") Writer writerInput){
+    public Writer logInOrSignUpWriter(@Valid @Argument("input") Writer writerInput){
         logger.info("Writer input {} ", writerInput);
-        return writerService.addWriter(new Writer(null,writerInput.getName(), writerInput.getBio()));
+        return writerService.logInOrSignUpWriter(new Writer(null,writerInput.getName(), writerInput.getBio(), writerInput.getEmail(), writerInput.getPassword()));
     }
 
     @QueryMapping()

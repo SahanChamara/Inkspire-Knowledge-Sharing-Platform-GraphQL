@@ -9,10 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ public class WriterServiceImpl implements WriterService {
 
     private final WriterRepository writerRepository;
     private final ModelMapper mapper;
+    private final PasswordEncoder passwordEncorder;
     private static final Logger logger = LoggerFactory.getLogger(WriterServiceImpl.class);
 
     @Override
@@ -44,11 +47,28 @@ public class WriterServiceImpl implements WriterService {
 
     @Override
     @Transactional
-    public Writer addWriter(Writer writer) {
+    public Writer logInOrSignUpWriter(Writer writer) {
         logger.info("Service Writer {}", writer);
-        if(writer != null){
-            return mapper.map(writerRepository.save(mapper.map(writer, WriterEntity.class)), Writer.class);
+
+        if(writer == null || writer.getEmail() == null || writer.getPassword() == null ){
+            throw new IllegalArgumentException("Email and Password are Required");
         }
-        return null;
+
+        Optional<WriterEntity> existingWriter = writerRepository.findByEmail(writer.getEmail());
+        if(existingWriter.isPresent()){
+            WriterEntity exsistingWriterEntity = existingWriter.get();
+            if(passwordEncorder.matches(writer.getPassword(), exsistingWriterEntity.getPassword())){
+                return mapper.map(existingWriter, Writer.class);
+            }
+            throw new IllegalArgumentException("Invalid Credentials");
+        }else {
+            WriterEntity writerEntity = new WriterEntity();
+            writerEntity.setName(writer.getName());
+            writerEntity.setBio(writer.getBio());
+            writerEntity.setEmail(writer.getEmail());
+            writerEntity.setPassword(passwordEncorder.encode(writer.getPassword()));
+
+            return mapper.map(writerRepository.save(writerEntity), Writer.class);
+        }
     }
 }

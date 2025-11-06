@@ -35,11 +35,13 @@ input ArticleInput {
 input WriterInput {
     name: String
     bio: String
+    email: String
+    password: String
 }
 
 # This is Mutation..this we use to POST
 type Mutation {
-    addWriter(input: WriterInput!): Writer!
+    logInOrSignUpWriter(input: WriterInput!): Writer!
     addArticle(input: ArticleInput!): Article!
     publishArticle(id: ID!): Article
     updateArticle(id: ID!, input: ArticleInput!): Article
