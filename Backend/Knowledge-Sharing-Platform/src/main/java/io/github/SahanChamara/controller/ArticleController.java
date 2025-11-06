@@ -58,4 +58,5 @@ public class ArticleController {
     public Flux<Article> articlePublished(){
         return articlePublisher.getPublisher();
     }
+
 }
