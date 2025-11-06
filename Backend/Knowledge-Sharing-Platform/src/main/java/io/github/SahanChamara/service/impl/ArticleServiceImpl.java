@@ -55,9 +55,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Article> getAllArticles() {
-        return articleRepository.findAll()
-                .stream()
+    public List<Article> getAllArticles(String status) {
+        List<ArticleEntity> articles = (status == null)
+                ? articleRepository.findAll()
+                : articleRepository.findByStatus(status);
+        return articles.stream()
                 .map(articleEntity -> mapper.map(articleEntity, Article.class))
                 .toList();
     }

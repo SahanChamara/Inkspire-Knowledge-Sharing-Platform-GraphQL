@@ -9,7 +9,7 @@ import java.util.Map;
 public interface ArticleService {
     Article addArticle(Article article);
     Article publishArticle(Long id);
-    List<Article> getAllArticles();
+    List<Article> getAllArticles(String status);
     Article articleById(Long id);
     Article updateArticle(Long id, Article article);
     Boolean deleteArticle(Long id);

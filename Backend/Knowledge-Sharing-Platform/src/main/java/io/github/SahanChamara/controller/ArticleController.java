@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,6 +30,11 @@ public class ArticleController {
         return articleService.addArticle(new Article(null, articleInput.getTitle(),
                 articleInput.getContent(), articleInput.getStatus(), articleInput.getWriterId(),articleInput.getPublishedAt()));
 
+    }
+
+    @QueryMapping
+    public List<Article> articles(@Argument Optional<String> status){
+        return articleService.getAllArticles(status.orElse(null));
     }
 
     @MutationMapping
