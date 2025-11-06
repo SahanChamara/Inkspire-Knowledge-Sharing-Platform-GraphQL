@@ -28,5 +28,5 @@ public class ArticleEntity {
     private Long writerId;
 
     @Column(name = "published_at")
-    private LocalDateTime publishedAt;
+        private LocalDateTime publishedAt;
 }

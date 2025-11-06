@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -16,6 +17,7 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
     List<ArticleEntity> findByStatus(String status);
 
     @Modifying
-    @Query("UPDATE ArticleEntity article SET article.status = :status article.published_at = :published_at WHERE article.id = :id")
+    @Transactional
+    @Query("UPDATE ArticleEntity article SET article.status = :status, article.publishedAt = :publishedAt WHERE article.id = :id")
     Integer updateStatus(@Param("id") Long id, @Param("status") String status, @Param("publishedAt") LocalDateTime publishedAt);
 }

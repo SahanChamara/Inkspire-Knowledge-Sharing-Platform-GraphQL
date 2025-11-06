@@ -84,8 +84,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional
     public Boolean deleteArticle(Long id) {
+        if(!articleRepository.existsById(id)) return Boolean.FALSE;
         articleRepository.deleteById(id);
-        return true;
+        return Boolean.TRUE;
     }
 
     @Override
