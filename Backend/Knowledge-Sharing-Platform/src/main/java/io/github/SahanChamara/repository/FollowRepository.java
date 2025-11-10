@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface FollowRepository extends JpaRepository<FollowEntity, Long> {
-    boolean existByFollowerIdAndFollowingId(Long followerId, Long followingId);
+    boolean existsByFollowerIdAndFollowingId(Long followerId, Long followingId);
     void deleteByFollowerIdAndFollowingId(Long followerId, Long followingId);
     List<FollowEntity> findByFollowerId(Long followerId);
     List<FollowEntity> findByFollowingId(Long followerId);

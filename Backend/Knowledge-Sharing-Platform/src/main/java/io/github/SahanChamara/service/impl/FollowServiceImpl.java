@@ -25,7 +25,7 @@ public class FollowServiceImpl implements FollowService {
     @Transactional
     public Boolean follow(Long followerId, Long followingId) {
         if(Objects.equals(followerId, followingId)) return Boolean.FALSE;
-        if(followRepository.existByFollowerIdAndFollowingId(followerId, followingId)) return Boolean.FALSE;
+        if(followRepository.existsByFollowerIdAndFollowingId(followerId, followingId)) return Boolean.FALSE;
 
         followRepository.save(new FollowEntity(null, followerId, followingId, LocalDateTime.now()));
         return Boolean.TRUE;
@@ -34,7 +34,7 @@ public class FollowServiceImpl implements FollowService {
     @Override
     @Transactional
     public Boolean unfollow(Long followerId, Long followingId) {
-        if(!followRepository.existByFollowerIdAndFollowingId(followerId,followingId)) return Boolean.FALSE;
+        if(!followRepository.existsByFollowerIdAndFollowingId(followerId,followingId)) return Boolean.FALSE;
         followRepository.deleteByFollowerIdAndFollowingId(followerId,followingId);;
         return Boolean.TRUE;
     }
@@ -42,7 +42,7 @@ public class FollowServiceImpl implements FollowService {
     @Override
     @Transactional(readOnly = true)
     public Boolean isFollowing(Long followerId, Long followingId) {
-        return followRepository.existByFollowerIdAndFollowingId(followerId, followingId);
+        return followRepository.existsByFollowerIdAndFollowingId(followerId, followingId);
     }
 
     @Override
