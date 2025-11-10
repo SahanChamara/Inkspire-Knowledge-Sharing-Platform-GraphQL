@@ -1,6 +1,7 @@
 package io.github.SahanChamara.service;
 
 import io.github.SahanChamara.dto.Article;
+import io.github.SahanChamara.entity.ArticleEntity;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,4 +15,5 @@ public interface ArticleService {
     Article updateArticle(Long id, Article article);
     Boolean deleteArticle(Long id);
     Map<Long, List<Article>> findArticleByWriterIds(Collection<Long> writerIds);
+    String buildPayloadForArticle(ArticleEntity article);
 }

@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,8 +22,9 @@ public class NotificationServiceImpl implements NotificationService {
     
     @Override
     @Transactional
-    public Notification createNotification(Notification notification) {
-        return mapper.map(notificationRepository.save(mapper.map(notification, NotificationEntity.class)), Notification.class);
+    public Notification createNotification(Long recipientId, Long actorId, Long articleId, String type, String payload) {
+        return mapper.map(notificationRepository.save(mapper.map(new Notification(null, recipientId, actorId, articleId, type, payload, false, LocalDateTime.now()), NotificationEntity.class))
+                , Notification.class);
     }
 
     @Override
