@@ -5,6 +5,8 @@ type Writer {
     name: String!
     bio: String
     articles: [Article!]!
+    followersCount: Int
+    isFollowedBy(meId: ID): Boolean
 }
 
 type Article {
@@ -16,12 +18,27 @@ type Article {
     publishedAt: String
 }
 
+type Notification {
+    id: ID!
+    recipientId: ID!
+    actorId: ID!
+    articleId: ID!
+    type: String
+    payload: String
+    readFlag: Boolean!
+    createdAt: String
+}
+
 # This is Queries..this is use to GET
 type Query {
     getWriters: [Writer!]!
     getWriterById(id: ID!): Writer
     articles(status: String): [Article!]!
     articleById(id: ID!): Article
+    followers(writerId: ID!): [Writer!]!
+    following(followerId: ID!): [Writer!]!
+    notifications(recipientId: ID!): [Notification!]!
+    unreadNotificationCount(recipientId: ID!): Int!
 }
 
 # This is Inputs...this we used to define a Mutation
@@ -46,8 +63,12 @@ type Mutation {
     publishArticle(id: ID!): Article
     updateArticle(id: ID!, input: ArticleInput!): Article
     deleteArticle(id: ID!): Boolean!
+    followWriter(targetId: ID!, followerId: ID!): Boolean!
+    unfollowWriter(targetId: ID!, followerId: ID!): Boolean!
+    markNotificationRead(notificationId: ID!): Boolean!
 }
 
 type Subscription {
     articlePublished: Article!
+    notificationAdded(recipientId: ID!): Notification!
 }
