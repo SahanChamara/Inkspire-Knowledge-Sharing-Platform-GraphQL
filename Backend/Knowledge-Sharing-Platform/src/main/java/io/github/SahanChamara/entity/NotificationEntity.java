@@ -32,7 +32,7 @@ public class NotificationEntity {
     @Column(name = "readFlag")
     private Boolean readFlag = false;
 
-    @Column(name = "payload")
+    @Column(columnDefinition = "json")
     private String payload;
 
     @Column(name = "createdAt")
