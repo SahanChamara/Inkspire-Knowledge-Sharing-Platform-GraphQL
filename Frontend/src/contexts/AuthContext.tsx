@@ -1,0 +1,100 @@
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User } from '@supabase/supabase-js';
+import { authService } from '../lib/auth';
+import { Profile } from '../lib/supabase';
+
+interface AuthContextType {
+  user: User | null;
+  profile: Profile | null;
+  loading: boolean;
+  signUp: (email: string, password: string, name: string, bio: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadProfile = async (currentUser: User | null) => {
+    if (!currentUser) {
+      setProfile(null);
+      return;
+    }
+
+    try {
+      const userProfile = await authService.getCurrentProfile();
+      setProfile(userProfile);
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      setProfile(null);
+    }
+  };
+
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const currentUser = await authService.getCurrentUser();
+        setUser(currentUser);
+        await loadProfile(currentUser);
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
+
+    const { data: { subscription } } = authService.onAuthStateChange(async (currentUser) => {
+      setUser(currentUser);
+      await loadProfile(currentUser);
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  const signUp = async (email: string, password: string, name: string, bio: string) => {
+    const { user: newUser, profile: newProfile } = await authService.signUp(email, password, name, bio);
+    setUser(newUser);
+    setProfile(newProfile);
+  };
+
+  const signIn = async (email: string, password: string) => {
+    const { user: newUser, profile: newProfile } = await authService.signIn(email, password);
+    setUser(newUser);
+    setProfile(newProfile);
+  };
+
+  const signOut = async () => {
+    await authService.signOut();
+    setUser(null);
+    setProfile(null);
+  };
+
+  const refreshProfile = async () => {
+    if (user) {
+      await loadProfile(user);
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, profile, loading, signUp, signIn, signOut, refreshProfile }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
