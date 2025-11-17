@@ -20,4 +20,7 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
     @Transactional
     @Query("UPDATE ArticleEntity article SET article.status = :status, article.publishedAt = :publishedAt WHERE article.id = :id")
     Integer updateStatus(@Param("id") Long id, @Param("status") String status, @Param("publishedAt") LocalDateTime publishedAt);
+
+    @Query("SELECT articles.writerId, COUNT(articles) FROM ArticleEntity articles WHERE articles.writerId IN :writerIds GROUP BY articles.writerId")
+    List<Object[]> countArticlesByWritersIds(@Param("writerIds") Collection<Long> writerIds);
 }

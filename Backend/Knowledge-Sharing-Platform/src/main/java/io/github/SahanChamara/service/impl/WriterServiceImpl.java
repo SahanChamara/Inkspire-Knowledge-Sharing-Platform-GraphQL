@@ -2,6 +2,7 @@ package io.github.SahanChamara.service.impl;
 
 import io.github.SahanChamara.dto.Writer;
 import io.github.SahanChamara.entity.WriterEntity;
+import io.github.SahanChamara.repository.ArticleRepository;
 import io.github.SahanChamara.repository.WriterRepository;
 import io.github.SahanChamara.service.WriterService;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +22,7 @@ import java.util.Optional;
 public class WriterServiceImpl implements WriterService {
 
     private final WriterRepository writerRepository;
+    private final ArticleRepository articleRepository;
     private final ModelMapper mapper;
     private final PasswordEncoder passwordEncorder;
     private static final Logger logger = LoggerFactory.getLogger(WriterServiceImpl.class);
@@ -29,10 +30,29 @@ public class WriterServiceImpl implements WriterService {
     @Override
     @Transactional(readOnly = true)
     public List<Writer> getAllWriters() {
-        return writerRepository.findAll()
-                .stream()
-                .map(writerEntity -> mapper.map(writerEntity, Writer.class))
-                .toList();
+        List<WriterEntity> writerEntities = writerRepository.findAll();
+        List<Long> writersIds = writerEntities.stream()
+                .map(WriterEntity::getId).toList();
+
+        Map<Long, Long> counts;
+        if(!writersIds.isEmpty()){
+            List<Object[]> rows = articleRepository.countArticlesByWritersIds(writersIds);
+            counts = new HashMap<>();
+            for (Object[] row : rows){
+                Long writerId = ((Number) row[0]).longValue();
+                Long count = ((Number) row[1]).longValue();
+                counts.put(writerId,count);
+            }
+        } else {
+            counts = Collections.emptyMap();
+        }
+
+        return writerEntities.stream()
+                .map( writerEntity -> {
+                            Writer writer = mapper.map(writerEntity, Writer.class);
+                            writer.setArticleCount(counts.getOrDefault(writer.getId(), 0L));
+                            return writer;
+                }).toList();
     }
 
     @Override

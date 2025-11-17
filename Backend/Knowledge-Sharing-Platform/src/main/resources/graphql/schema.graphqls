@@ -6,6 +6,8 @@ type Writer {
     bio: String
     articles: [Article!]!
     followersCount: Int
+    avatarUrl: String
+    articleCount: Int
     isFollowedBy(meId: ID): Boolean
 }
 

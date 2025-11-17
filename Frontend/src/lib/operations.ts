@@ -93,6 +93,7 @@ export const LOGINORSIGNUP = gql`
             name
             bio
             email
+            password
         }
     }
 `;

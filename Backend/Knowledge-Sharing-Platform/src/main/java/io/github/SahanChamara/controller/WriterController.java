@@ -13,6 +13,7 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -27,7 +28,16 @@ public class WriterController {
     @MutationMapping()
     public Writer logInOrSignUpWriter(@Valid @Argument("input") Writer writerInput){
         logger.info("Writer input {} ", writerInput);
-        return writerService.logInOrSignUpWriter(new Writer(null,writerInput.getName(), writerInput.getBio(), writerInput.getEmail(), writerInput.getPassword()));
+        return writerService.logInOrSignUpWriter(new Writer(null,
+                writerInput.getName(),
+                writerInput.getBio(),
+                writerInput.getEmail(),
+                writerInput.getPassword(),
+                null,
+                null,
+                null,
+                LocalDateTime.now(),
+                LocalDateTime.now()));
     }
 
     @QueryMapping()

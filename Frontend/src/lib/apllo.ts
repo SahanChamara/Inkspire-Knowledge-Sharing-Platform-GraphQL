@@ -1,11 +1,7 @@
-import { InMemoryCache } from "@apollo/client";
-import { ApolloClient, split } from "@apollo/client";
-import { HttpLink } from "@apollo/client";
+import { InMemoryCache, ApolloClient, split, HttpLink } from "@apollo/client";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { createClient } from "graphql-ws";
-
-
 
 const httpUrl = import.meta.env.VITE_GRAPHQL_HTTP;
 const wsUrl = import.meta.env.VITE_GRAPHQL_WS;

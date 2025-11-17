@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "writers")
 @Data
@@ -23,4 +25,19 @@ public class WriterEntity {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "avatarUrl")
+    private String avatarUrl;
+
+    @Column(name = "followersCount")
+    private Long followersCount;
+
+    @Column(name = "articleCount")
+    private Long articleCount;
+
+    @Column(name = "createdAt")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updatedAt")
+    private LocalDateTime updatedAt;
 }
