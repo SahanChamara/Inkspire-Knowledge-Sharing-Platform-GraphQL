@@ -18,6 +18,8 @@ export const WRITER_FRAGMENT = gql`
         name
         bio
         followersCount
+        avatarUrl
+        articleCount
         isFollowedBy(meId: $ME_ID)
         articles {...ArticleFields}
     }
