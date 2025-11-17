@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
+// import { User } from '@supabase/supabase-js';
 import { authService } from '../lib/auth';
-import { Profile } from '../lib/supabase';
+// import { Profile } from '../lib/supabase';
+import { Writer } from '../lib/types';
 
 interface AuthContextType {
-  user: User | null;
-  profile: Profile | null;
+  user: Writer | null;
+  profile: Writer | null;
   loading: boolean;
   signUp: (email: string, password: string, name: string, bio: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
@@ -16,11 +17,11 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [user, setUser] = useState<Writer | null>(null);
+  const [profile, setProfile] = useState<Writer | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadProfile = async (currentUser: User | null) => {
+  const loadProfile = async (currentUser: Writer | null) => {
     if (!currentUser) {
       setProfile(null);
       return;

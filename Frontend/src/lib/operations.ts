@@ -89,7 +89,7 @@ export const GET_UNREAD_NOTIFICATION_COUNT = gql`
 
 /* This is Mutations */
 export const LOGINORSIGNUP = gql`
-    mutation LogInOnSignUp($input: WriterInput!){
+    mutation LogInOrSignUp($input: WriterInput!){
         logInOrSignUpWriter(input: $input){
             id
             name

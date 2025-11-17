@@ -1,36 +1,33 @@
-import { supabase, Profile } from './supabase';
+// import { supabase, Profile } from './supabase';
+
+import { apolloClient } from "./apllo";
+import { GET_WRITER, LOGINORSIGNUP } from "./operations";
+import { Writer } from "./types";
+
 
 export const authService = {
-  async signUp(email: string, password: string, name: string, bio: string) {
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
+  async logInOrSignUpWriter(input : {email: string, password: string, name: string, bio: string}) {
+    const result = await apolloClient.mutate<
+      { logInOrSignUpWriter: Writer },
+      { input: { email: string; password: string; name: string; bio: string } }
+    >({
+      mutation: LOGINORSIGNUP,
+      variables: { input },
     });
 
-    if (authError || !authData.user) {
-      throw authError || new Error('Failed to create user');
+    if (result.error) {
+      throw new Error('Failed to create user');
     }
 
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .insert([
-        {
-          user_id: authData.user.id,
-          name,
-          bio,
-        },
-      ])
-      .select()
-      .single();
-
-    if (profileError) {
-      throw profileError;
+    const writer: Writer | undefined = result.data?.logInOrSignUpWriter;
+    if (!writer) {
+      throw new Error('Failed to create user');
     }
 
-    return { user: authData.user, profile };
+    return { user: writer, profile: writer };
   },
 
-  async signIn(email: string, password: string) {
+  /* async signIn(email: string, password: string) {
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -56,15 +53,15 @@ export const authService = {
   async signOut() {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
-  },
+  }, */
 
-  async getCurrentUser() {
+/*   async getCurrentUser() {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) throw error;
     return user;
-  },
+  }, */
 
-  async getCurrentProfile(): Promise<Profile | null> {
+/*   async getCurrentProfile(): Promise<Profile | null> {
     const user = await this.getCurrentUser();
     if (!user) return null;
 
@@ -76,20 +73,26 @@ export const authService = {
 
     if (error) throw error;
     return data;
+  }, */
+
+  async getProfileById(profileId: string): Promise<Writer | null> {
+    const result = await apolloClient.query<
+      { getWriterById: Writer | null },
+      { id: string }
+    >({
+      query: GET_WRITER,
+      variables: { id: profileId },
+      fetchPolicy: "network-only",
+    });
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return result.data?.getWriterById ?? null;
   },
 
-  async getProfileById(profileId: string): Promise<Profile | null> {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', profileId)
-      .maybeSingle();
-
-    if (error) throw error;
-    return data;
-  },
-
-  async updateProfile(profileId: string, updates: Partial<Profile>) {
+/*   async updateProfile(profileId: string, updates: Partial<Profile>) {
     const { data, error } = await supabase
       .from('profiles')
       .update(updates)
@@ -99,11 +102,11 @@ export const authService = {
 
     if (error) throw error;
     return data;
-  },
+  }, */
 
-  onAuthStateChange(callback: (user: any) => void) {
+/*   onAuthStateChange(callback: (user: any) => void) {
     return supabase.auth.onAuthStateChange((_event, session) => {
       callback(session?.user ?? null);
     });
-  },
+  }, */
 };
