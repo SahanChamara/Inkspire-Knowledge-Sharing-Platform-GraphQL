@@ -91,4 +91,16 @@ public class WriterServiceImpl implements WriterService {
             return mapper.map(writerRepository.save(writerEntity), Writer.class);
         }
     }
+
+    @Override
+    public Writer updateWriter(Long id,Writer writer) {
+        if(id != null && writer != null){
+            Optional<WriterEntity> isExist = writerRepository.findById(id);
+            if(isExist.isPresent()){
+                return mapper.map(writerRepository.save(mapper.map(writer, WriterEntity.class)), Writer.class);
+            }
+            return null;
+        }
+        return null;
+    }
 }

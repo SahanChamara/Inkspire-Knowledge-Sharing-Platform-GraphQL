@@ -40,6 +40,11 @@ public class WriterController {
                 LocalDateTime.now()));
     }
 
+    @MutationMapping()
+    public Writer updateWriter(Long id, Writer writer){
+        return writerService.updateWriter(id,writer);
+    }
+
     @QueryMapping()
     public List<Writer> getWriters(){
         return writerService.getAllWriters();

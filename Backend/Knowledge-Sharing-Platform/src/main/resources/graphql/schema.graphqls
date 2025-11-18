@@ -56,17 +56,19 @@ input WriterInput {
     bio: String
     email: String
     password: String
+    avatarUrl: String
 }
 
 # This is Mutation..this we use to POST
 type Mutation {
     logInOrSignUpWriter(input: WriterInput!): Writer!
+    followWriter(targetId: ID!, followerId: ID!): Boolean!
+    unfollowWriter(targetId: ID!, followerId: ID!): Boolean!
+    updateWriter(id: ID!, input: WriterInput!): Writer
     addArticle(input: ArticleInput!): Article!
     publishArticle(id: ID!): Article
     updateArticle(id: ID!, input: ArticleInput!): Article
     deleteArticle(id: ID!): Boolean!
-    followWriter(targetId: ID!, followerId: ID!): Boolean!
-    unfollowWriter(targetId: ID!, followerId: ID!): Boolean!
     markNotificationRead(notificationId: ID!): Boolean!
 }
 

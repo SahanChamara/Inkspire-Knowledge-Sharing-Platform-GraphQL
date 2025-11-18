@@ -8,4 +8,5 @@ public interface WriterService {
     List<Writer> getAllWriters();
     Writer getWriterById(Long id);
     Writer logInOrSignUpWriter(Writer writer);
+    Writer updateWriter(Long id, Writer writer);
 }
