@@ -109,6 +109,24 @@ export const ADD_ARTICLE = gql`
     ${ARTICLE_FRAGMENT}
 `;
 
+export const UPDATEWRITER = gql`
+    mutation UpdateWriter($id: ID!, $input: WriterInput!){
+        updateWriter(id: $id, input: $input){
+            ...WriterFields
+        }
+    }
+    ${WRITER_FRAGMENT}
+`
+
+export const UPDATEARTICLE = gql`
+    mutation UpdateArticle($id: ID!, $input: ArticleInput!){
+        updateArticle(id: $id, input: $input){
+            ...ArticleFields
+        }
+    }
+    ${ARTICLE_FRAGMENT}
+`
+
 export const PUBLISHED_ARTICLE = gql`
     mutation PublishedArticle($id: ID!){
         publishArticle(id: $id){

@@ -1,7 +1,7 @@
 // import { supabase, Profile } from './supabase';
 
 import { apolloClient } from "./apllo";
-import { GET_WRITER, LOGINORSIGNUP } from "./operations";
+import { GET_WRITER, LOGINORSIGNUP, UPDATEWRITER } from "./operations";
 import { Writer } from "./types";
 
 
@@ -23,6 +23,9 @@ export const authService = {
     if (!writer) {
       throw new Error('Failed to create user');
     }
+
+    localStorage.setItem("userId", writer.id.toString());
+    localStorage.setItem("userName", writer.name);
 
     return { user: writer, profile: writer };
   },
@@ -91,6 +94,17 @@ export const authService = {
 
     return result.data?.getWriterById ?? null;
   },
+
+  async updateProfile(input : {id: string, name: string, bio: string, avatarUrl: string}){
+    const result = await apolloClient.mutate<
+      {updateWriter: Writer | null},
+      {id: string; input : {id: string, name: string, bio: string, avatarUrl: string}}
+    >({
+      mutation: UPDATEWRITER,
+      variables: {id: input.id, input},
+    });
+    return result.data?.updateWriter;
+  }
 
 /*   async updateProfile(profileId: string, updates: Partial<Profile>) {
     const { data, error } = await supabase

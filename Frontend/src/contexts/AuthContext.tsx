@@ -27,8 +27,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    try {
-      const userProfile = await authService.getCurrentProfile();
+    try {      
+      const userProfile = await authService.getProfileById(currentUser.id.toString());
       setProfile(userProfile);
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -39,7 +39,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const currentUser = await authService.getCurrentUser();
+        const currentUser = profile?.id
+          ? await authService.getProfileById(profile.id.toString())
+          : null;
         setUser(currentUser);
         await loadProfile(currentUser);
       } catch (error) {
