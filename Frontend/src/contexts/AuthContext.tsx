@@ -64,13 +64,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, name: string, bio: string) => {
-    const { user: newUser, profile: newProfile } = await authService.signUp(email, password, name, bio);
+    const { user: newUser, profile: newProfile } = await authService.logInOrSignUpWriter({email, password, name, bio});
     setUser(newUser);
     setProfile(newProfile);
   };
 
   const signIn = async (email: string, password: string) => {
-    const { user: newUser, profile: newProfile } = await authService.signIn(email, password);
+    const { user: newUser, profile: newProfile } = await authService.logInOrSignUpWriter({email, password, name: '', bio: ''});
     setUser(newUser);
     setProfile(newProfile);
   };

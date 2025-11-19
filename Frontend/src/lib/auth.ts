@@ -6,7 +6,7 @@ import { Writer } from "./types";
 
 
 export const authService = {
-  async logInOrSignUpWriter(input : {email: string, password: string, name: string, bio: string}) {
+  async logInOrSignUpWriter(input: { email: string, password: string, name: string | any, bio: string | any }) {
     const result = await apolloClient.mutate<
       { logInOrSignUpWriter: Writer },
       { input: { email: string; password: string; name: string; bio: string } }
@@ -51,32 +51,32 @@ export const authService = {
     }
 
     return { user: authData.user, profile };
-  },
+  },*/
 
-  async signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-  }, */
 
-/*   async getCurrentUser() {
+  /*   async getCurrentUser() {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) throw error;
     return user;
-  }, */
+    }, */
 
-/*   async getCurrentProfile(): Promise<Profile | null> {
+  /*   async getCurrentProfile(): Promise<Profile | null> {
     const user = await this.getCurrentUser();
     if (!user) return null;
 
     const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
+    .from('profiles')
+    .select('*')
+    .eq('user_id', user.id)
+    .maybeSingle();
+    
     if (error) throw error;
     return data;
-  }, */
+    }, */
+
+  async signOut() {
+    localStorage.clear();
+  },
 
   async getProfileById(profileId: string): Promise<Writer | null> {
     const result = await apolloClient.query<
@@ -95,32 +95,32 @@ export const authService = {
     return result.data?.getWriterById ?? null;
   },
 
-  async updateProfile(input : {id: string, name: string, bio: string, avatarUrl: string}){
+  async updateProfile(input: { id: string, name: string, bio: string, avatarUrl: string }) {
     const result = await apolloClient.mutate<
-      {updateWriter: Writer | null},
-      {id: string; input : {id: string, name: string, bio: string, avatarUrl: string}}
+      { updateWriter: Writer | null },
+      { id: string; input: { id: string, name: string, bio: string, avatarUrl: string } }
     >({
       mutation: UPDATEWRITER,
-      variables: {id: input.id, input},
+      variables: { id: input.id, input },
     });
     return result.data?.updateWriter;
   }
 
-/*   async updateProfile(profileId: string, updates: Partial<Profile>) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', profileId)
-      .select()
-      .single();
+  /*   async updateProfile(profileId: string, updates: Partial<Profile>) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', profileId)
+        .select()
+        .single();
+  
+      if (error) throw error;
+      return data;
+    }, */
 
-    if (error) throw error;
-    return data;
-  }, */
-
-/*   onAuthStateChange(callback: (user: any) => void) {
+    onAuthStateChange(callback: (user: any) => void) {
     return supabase.auth.onAuthStateChange((_event, session) => {
       callback(session?.user ?? null);
     });
-  }, */
+  },
 };
