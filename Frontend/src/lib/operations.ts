@@ -17,6 +17,8 @@ export const WRITER_FRAGMENT = gql`
         id
         name
         bio
+        email
+        password
         followersCount
         avatarUrl
         articleCount
@@ -92,10 +94,10 @@ export const LOGINORSIGNUP = gql`
     mutation LogInOrSignUp($input: WriterInput!){
         logInOrSignUpWriter(input: $input){
             id
-            name
-            bio
             email
             password
+            name
+            bio
         }
     }
 `;
@@ -137,13 +139,13 @@ export const PUBLISHED_ARTICLE = gql`
 `;
 
 export const FOLLOW_WRITER = gql`
-    mutation FollowWriter($targetId: ID!, followerId: $ID!){
+    mutation FollowWriter($targetId: ID!, $followerId: ID!){
         followWriter(targetId: $targetId, followerId: $followerId)
     }
 `;
 
 export const UNFOLLOW_WRITER = gql`
-    mutation UnFollowWriter($targetId: ID!, followerId: $ID!){
+    mutation UnFollowWriter($targetId: ID!, $followerId: ID!){
         unfollowWriter(targetId: $targetId, followerId: $followerId)
     }
 `;

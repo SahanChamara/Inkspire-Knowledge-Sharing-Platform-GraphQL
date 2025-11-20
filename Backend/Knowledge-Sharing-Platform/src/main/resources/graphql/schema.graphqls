@@ -4,6 +4,8 @@ type Writer {
     id: ID!
     name: String!
     bio: String
+    email: String
+    password: String
     articles: [Article!]!
     followersCount: Int
     avatarUrl: String
