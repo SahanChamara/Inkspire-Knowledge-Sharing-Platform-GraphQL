@@ -37,6 +37,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
+    let mounted = true;
+
     const initAuth = async () => {
       try {
         const currentUser = profile?.id
@@ -53,13 +55,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     initAuth();
 
-    const { data: { subscription } } = authService.onAuthStateChange(async (currentUser) => {
+    const unsubscribe = authService.onAuthStateChange(async (currentUser) => {
       setUser(currentUser);
-      await loadProfile(currentUser);
-    });
+      if(currentUser){
+        try{
+          const fresh = await authService.getProfileById(currentUser.id.toString());
+          if(!mounted) return
+          setUser(fresh ?? currentUser);
+        }catch(err){
+          console.error("Error loading fresh profile", err);          
+        }finally {
+          if(mounted) setLoading(false);
+        }
+      }
+    }); 
 
     return () => {
-      subscription?.unsubscribe();
+      mounted = false;
+      unsubscribe();
     };
   }, []);
 
