@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.graphql.data.method.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -49,8 +50,24 @@ public class ArticleController {
         return articleService.deleteArticle(id);
     }
 
+    @QueryMapping
     public Article articleById(@Argument Long id){
         return articleService.articleById(id);
+    }
+
+    @QueryMapping
+    public List<Article> articlesByWriter(@Argument Long writerId){
+        return articleService.articlesByWriter(writerId);
+    }
+
+    @QueryMapping
+    public List<Article> draftsByWriter(@Argument Long writerId){
+        return articleService.draftsByWriter(writerId);
+    }
+
+    @QueryMapping
+    public List<Article> publishedByWriter(@Argument Long writerId){
+        return articleService.publishedByWriter(writerId);
     }
 
     @QueryMapping

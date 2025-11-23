@@ -12,6 +12,7 @@ import io.github.SahanChamara.repository.ArticleRepository;
 import io.github.SahanChamara.repository.FollowRepository;
 import io.github.SahanChamara.service.ArticleService;
 import io.github.SahanChamara.service.NotificationService;
+import io.github.SahanChamara.util.ArticleStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -89,6 +90,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional
     public List<Article> articlesByWriter(Long writerId) {
         return articleRepository.findByWriterId(writerId)
                 .stream()
@@ -97,17 +99,21 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Transactional
     public List<Article> draftsByWriter(Long writerId) {
-        return articleRepository.findByWriterId(writerId)
+        return articleRepository.findByWriterIdAndStatus(writerId, ArticleStatus.DRAFT)
                 .stream()
-                .filter(articleEntity -> articleEntity.getStatus().equals("DRAFT"))
                 .map(articleEntity -> mapper.map(articleEntity, Article.class))
                 .toList();
     }
 
     @Override
+    @Transactional
     public List<Article> publishedByWriter(Long writerId) {
-        return List.of();
+        return articleRepository.findByWriterIdAndStatus(writerId, ArticleStatus.PUBLISHED)
+                .stream()
+                .map(articleEntity -> mapper.map(articleEntity, Article.class))
+                .toList();
     }
 
     @Override
