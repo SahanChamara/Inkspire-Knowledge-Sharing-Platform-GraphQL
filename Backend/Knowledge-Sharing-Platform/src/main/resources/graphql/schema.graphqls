@@ -39,6 +39,9 @@ type Query {
     getWriterById(id: ID!): Writer
     articles(status: String): [Article!]!
     articleById(id: ID!): Article
+    articlesByWriter(writerId: ID!): Article
+    draftsByWriter(writerId: ID!): [Article!]!
+    publishedByWriter(writerId: ID!): [Article!]!
     followers(writerId: ID!): [Writer!]!
     following(followerId: ID!): [Writer!]!
     notifications(recipientId: ID!): [Notification!]!
