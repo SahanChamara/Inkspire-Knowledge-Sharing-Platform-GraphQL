@@ -89,6 +89,28 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public List<Article> articlesByWriter(Long writerId) {
+        return articleRepository.findByWriterId(writerId)
+                .stream()
+                .map(articleEntity -> mapper.map(articleEntity, Article.class))
+                .toList();
+    }
+
+    @Override
+    public List<Article> draftsByWriter(Long writerId) {
+        return articleRepository.findByWriterId(writerId)
+                .stream()
+                .filter(articleEntity -> articleEntity.getStatus().equals("DRAFT"))
+                .map(articleEntity -> mapper.map(articleEntity, Article.class))
+                .toList();
+    }
+
+    @Override
+    public List<Article> publishedByWriter(Long writerId) {
+        return List.of();
+    }
+
+    @Override
     @Transactional
     public Article updateArticle(Long id, Article article) {
         if (id != null && article != null) {
@@ -108,6 +130,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleRepository.deleteById(id);
         return Boolean.TRUE;
     }
+
 
     @Override
     @Transactional(readOnly = true)

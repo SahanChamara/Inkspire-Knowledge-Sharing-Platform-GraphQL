@@ -12,6 +12,9 @@ public interface ArticleService {
     Article publishArticle(Long id);
     List<Article> getAllArticles(String status);
     Article articleById(Long id);
+    List<Article> articlesByWriter(Long writerId);
+    List<Article> draftsByWriter(Long writerId);
+    List<Article> publishedByWriter(Long writerId);
     Article updateArticle(Long id, Article article);
     Boolean deleteArticle(Long id);
     Map<Long, List<Article>> findArticleByWriterIds(Collection<Long> writerIds);

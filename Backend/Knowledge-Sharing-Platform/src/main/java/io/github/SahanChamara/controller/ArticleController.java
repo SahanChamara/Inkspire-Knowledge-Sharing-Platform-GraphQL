@@ -33,11 +33,6 @@ public class ArticleController {
 
     }
 
-    @QueryMapping
-    public List<Article> articles(@Argument Optional<String> status){
-        return articleService.getAllArticles(status.orElse(null));
-    }
-
     @MutationMapping
     public Article publisheArticle(@Argument Long id){
         return articleService.publishArticle(id);
@@ -52,6 +47,15 @@ public class ArticleController {
     @MutationMapping
     public Boolean deleteArticle(@Argument Long id){
         return articleService.deleteArticle(id);
+    }
+
+    public Article articleById(@Argument Long id){
+        return articleService.articleById(id);
+    }
+
+    @QueryMapping
+    public List<Article> articles(@Argument Optional<String> status){
+        return articleService.getAllArticles(status.orElse(null));
     }
 
     @BatchMapping(typeName = "Writer", field = "articles")
