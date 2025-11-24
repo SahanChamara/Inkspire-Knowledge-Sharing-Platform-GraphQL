@@ -41,6 +41,67 @@ export const authService = {
     return { user: writer, profile: writer };
   },
 
+  async signOut() {
+    localStorage.clear();
+  },
+
+  async getProfileById(profileId: string): Promise<Writer | null> {
+    const result = await apolloClient.query<
+      { getWriterById: Writer | null },
+      { id: string }
+    >({
+      query: GET_WRITER,
+      variables: { id: profileId },
+      fetchPolicy: "network-only",
+    });
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return result.data?.getWriterById ?? null;
+  },
+
+  async updateProfile(input: { id: string, name: string, bio: string, avatarUrl: string }) {
+    const result = await apolloClient.mutate<
+      { updateWriter: Writer | null },
+      { id: string; input: { id: string, name: string, bio: string, avatarUrl: string } }
+    >({
+      mutation: UPDATEWRITER,
+      variables: { id: input.id, input },
+    });
+    return result.data?.updateWriter;
+  },
+
+    onAuthStateChange(callback: (user: Writer | null) => void) {
+      const handler = (ev: Event) => {
+        const details = (ev as CustomEvent).detail as Writer | null;
+        callback(details);
+      };
+      authEventTarget.addEventListener("authChange", handler as EventListener);
+
+          const storageHandler = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) {
+        const newVal = e.newValue ? JSON.parse(e.newValue) as Writer : null;
+        callback(newVal);
+      }
+      // also listen to the special signal key that we toggle to notify tabs
+      if (e.key === "__inkspire_auth_signal") {
+        // read the actual writer from STORAGE_KEY
+        const newVal = localStorage.getItem(STORAGE_KEY);
+        callback(newVal ? JSON.parse(newVal) as Writer : null);
+      }
+    };
+    window.addEventListener("storage", storageHandler);
+
+    // Return unsubscribe function
+    return () => {
+      authEventTarget.removeEventListener("authChange", handler as EventListener);
+      window.removeEventListener("storage", storageHandler);
+    };      
+  }
+
+
   /* async signIn(email: string, password: string) {
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
@@ -84,76 +145,4 @@ export const authService = {
     if (error) throw error;
     return data;
     }, */
-
-  async signOut() {
-    localStorage.clear();
-  },
-
-  async getProfileById(profileId: string): Promise<Writer | null> {
-    const result = await apolloClient.query<
-      { getWriterById: Writer | null },
-      { id: string }
-    >({
-      query: GET_WRITER,
-      variables: { id: profileId },
-      fetchPolicy: "network-only",
-    });
-
-    if (result.error) {
-      throw new Error(result.error.message);
-    }
-
-    return result.data?.getWriterById ?? null;
-  },
-
-  async updateProfile(input: { id: string, name: string, bio: string, avatarUrl: string }) {
-    const result = await apolloClient.mutate<
-      { updateWriter: Writer | null },
-      { id: string; input: { id: string, name: string, bio: string, avatarUrl: string } }
-    >({
-      mutation: UPDATEWRITER,
-      variables: { id: input.id, input },
-    });
-    return result.data?.updateWriter;
-  },
-
-  /*   async updateProfile(profileId: string, updates: Partial<Profile>) {
-      const { data, error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', profileId)
-        .select()
-        .single();
-  
-      if (error) throw error;
-      return data;
-    }, */
-
-    onAuthStateChange(callback: (user: Writer | null) => void) {
-      const handler = (ev: Event) => {
-        const details = (ev as CustomEvent).detail as Writer | null;
-        callback(details);
-      };
-      authEventTarget.addEventListener("authChange", handler as EventListener);
-
-          const storageHandler = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) {
-        const newVal = e.newValue ? JSON.parse(e.newValue) as Writer : null;
-        callback(newVal);
-      }
-      // also listen to the special signal key that we toggle to notify tabs
-      if (e.key === "__inkspire_auth_signal") {
-        // read the actual writer from STORAGE_KEY
-        const newVal = localStorage.getItem(STORAGE_KEY);
-        callback(newVal ? JSON.parse(newVal) as Writer : null);
-      }
-    };
-    window.addEventListener("storage", storageHandler);
-
-    // Return unsubscribe function
-    return () => {
-      authEventTarget.removeEventListener("authChange", handler as EventListener);
-      window.removeEventListener("storage", storageHandler);
-    };      
-  }
 };

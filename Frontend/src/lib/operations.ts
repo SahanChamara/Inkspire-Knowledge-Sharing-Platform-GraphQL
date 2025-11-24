@@ -68,6 +68,46 @@ export const GET_ARTICLES = gql`
     ${ARTICLE_FRAGMENT}
 `;
 
+export const GET_ARTICLE_BY_ID = gql`
+    query GetArticleById($id: ID!){
+        articleById(id: $id){
+            id
+            title
+            content
+            status
+            writerId
+            publishAt
+        }
+    }
+`
+
+export const GET_ARTICLES_BY_WRITER = gql`
+    query GetArticlesByWriter($writerId: ID!){
+        articlesByWriter(writerId: $writerId){
+            ...ArticleFields
+        }
+    }
+    ${ARTICLE_FRAGMENT}
+`
+
+export const GET_DRAFT_BY_WRITER = gql`
+    query GetDraftByWriter($writerId: ID!){
+        draftByWriter(writerId: $writerId){
+            ...ArticleFields
+        }
+    }
+    ${ARTICLE_FRAGMENT}
+`
+
+export const GET_PUBLISHED_BY_WRITER = gql`
+    query GetPublishedByWriter($writerId: ID!){
+        publishedByWriter(writerId: $writerId){
+            ...ArticleFields
+        }
+    }
+    ${ARTICLE_FRAGMENT}
+`
+
 export const GET_NOTIFICATIONS = gql`
     query Notifications($recipientId: ID!){
         notifications(recipientId: $recipientId){
