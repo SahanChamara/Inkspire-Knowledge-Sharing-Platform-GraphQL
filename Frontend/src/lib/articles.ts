@@ -1,7 +1,7 @@
 // import { supabase, Article, ArticleWithWriter } from './supabase';
 
 import { apolloClient } from "./apllo";
-import { GET_ARTICLE_BY_ID, GET_ARTICLES, GET_ARTICLES_BY_WRITER, GET_DRAFT_BY_WRITER, GET_PUBLISHED_BY_WRITER } from "./operations";
+import { ADD_ARTICLE, GET_ARTICLE_BY_ID, GET_ARTICLES, GET_ARTICLES_BY_WRITER, GET_DRAFT_BY_WRITER, GET_PUBLISHED_BY_WRITER } from "./operations";
 import { Article } from "./types";
 
 export const articleService = {
@@ -90,23 +90,33 @@ export const articleService = {
     return result.data?.publishedByWriter ?? [];
   },
 
-  async createArticle(article: {
-    writer_id: string;
-    title: string;
-    content: string;
-    excerpt?: string;
-    cover_image?: string;
-    tags?: string[];
-    read_time?: number;
+  async createArticle(input: {
+    writer_id: string,
+    title: string,
+    content: string,
+    excerpt: string,
+    coverImageUrl: string,
+    tags: string[],
+    readTime: number,
   }): Promise<Article> {
-    const { data, error } = await supabase
-      .from('articles')
-      .insert([article])
-      .select()
-      .single();
+    const result = await apolloClient.mutate<
+    {addArticle: Article},
+    {input: {writer_id: string; title: string; content: string; excerpt: string; coverImageUrl: string; tags: string[]; readTime: number}}
+    >({
+      mutation: ADD_ARTICLE,
+      variables: {input}
+    });
 
-    if (error) throw error;
-    return data;
+    if(result.error){
+      throw new Error(result.error.message);
+    }
+
+    const article: Article | undefined = result.data?.addArticle;
+    if(!article){
+      throw new Error("Failed to Add Article");
+    }
+
+    return article;
   },
 
   async updateArticle(id: string, updates: Partial<Article>): Promise<Article> {
