@@ -74,15 +74,20 @@ export const articleService = {
   },
 
   async getPublishedByWriter(writerId: string): Promise<Article[]> {
-    const { data, error } = await supabase
-      .from('articles')
-      .select('*')
-      .eq('writer_id', writerId)
-      .eq('status', 'PUBLISHED')
-      .order('published_at', { ascending: false });
+    const result = await apolloClient.query<
+    {publishedByWriter: Article[]},
+    {writerId: string}
+    >({
+      query: GET_PUBLISHED_BY_WRITER,
+      variables: {writerId: writerId},
+      fetchPolicy: "network-only"
+    })
 
-    if (error) throw error;
-    return data;
+    if(result.error){
+      throw new Error(result.error.message);
+    }
+
+    return result.data?.publishedByWriter ?? [];
   },
 
   async createArticle(article: {

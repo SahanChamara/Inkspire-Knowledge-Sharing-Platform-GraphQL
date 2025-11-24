@@ -4,7 +4,7 @@ export type Article = {
     content: string;
     status: string;
     writerId: string;
-    publishAt: string;
+    publishedAt: string;
 }
 
 
