@@ -1,17 +1,17 @@
 // import { supabase, Article, ArticleWithWriter } from './supabase';
 
 import { apolloClient } from "./apllo";
-import { GET_ARTICLE_BY_ID, GET_PUBLISHED_BY_WRITER } from "./operations";
-import { Article, Writer } from "./types";
+import { GET_ARTICLE_BY_ID, GET_ARTICLES, GET_PUBLISHED_BY_WRITER } from "./operations";
+import { Article } from "./types";
 
 export const articleService = {
-  async getPublishedArticles(writerId: string): Promise<Article[]> {
+  async getPublishedArticles(status: string): Promise<Article[]> {
     const result  = await apolloClient.query<
-    {publishedByWriter: Article[]},
-    { writerId: string }
+    {articles: Article[]},
+    {status: string}
     >({
-      query: GET_PUBLISHED_BY_WRITER,
-      variables: {writerId: writerId},
+      query: GET_ARTICLES,
+      variables: {status: status},
       fetchPolicy: "network-only",
     });
 
@@ -19,7 +19,7 @@ export const articleService = {
       throw new Error(result.error.message);
     }
 
-    return result.data?.publishedByWriter ?? [];
+    return result.data?.articles ?? [];
   },
 
   async getArticleById(id: string): Promise<Article | null> {
