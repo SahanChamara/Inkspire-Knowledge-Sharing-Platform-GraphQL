@@ -1,7 +1,7 @@
 // import { supabase, Article, ArticleWithWriter } from './supabase';
 
 import { apolloClient } from "./apllo";
-import { GET_ARTICLE_BY_ID, GET_ARTICLES, GET_PUBLISHED_BY_WRITER } from "./operations";
+import { GET_ARTICLE_BY_ID, GET_ARTICLES, GET_ARTICLES_BY_WRITER, GET_DRAFT_BY_WRITER, GET_PUBLISHED_BY_WRITER } from "./operations";
 import { Article } from "./types";
 
 export const articleService = {
@@ -40,26 +40,37 @@ export const articleService = {
   },
 
   async getArticlesByWriter(writerId: string): Promise<Article[]> {
-    const { data, error } = await supabase
-      .from('articles')
-      .select('*')
-      .eq('writer_id', writerId)
-      .order('created_at', { ascending: false });
+    const result = await apolloClient.query<
+    {articlesByWriter: Article[]},
+    {writerId: string}
+    >({
+      query: GET_ARTICLES_BY_WRITER, 
+      variables: {writerId: writerId},
+      fetchPolicy: "network-only"
+    });
 
-    if (error) throw error;
-    return data;
+    if(result.error){
+      throw new Error(result.error.message);
+    }
+
+    return result.data?.articlesByWriter ?? []
   },
 
   async getDraftsByWriter(writerId: string): Promise<Article[]> {
-    const { data, error } = await supabase
-      .from('articles')
-      .select('*')
-      .eq('writer_id', writerId)
-      .eq('status', 'DRAFT')
-      .order('updated_at', { ascending: false });
+    const result = await apolloClient.query<
+    {draftsByWriter: Article[]},
+    {writerId: string}
+    >({
+      query: GET_DRAFT_BY_WRITER,
+      variables: {writerId: writerId},
+      fetchPolicy: "network-only"
+    });
 
-    if (error) throw error;
-    return data;
+    if(result.error){
+      throw new Error(result.error.message);
+    }
+
+    return result.data?.draftsByWriter ?? [];
   },
 
   async getPublishedByWriter(writerId: string): Promise<Article[]> {

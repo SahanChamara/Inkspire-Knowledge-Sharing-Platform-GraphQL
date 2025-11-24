@@ -92,7 +92,7 @@ export const GET_ARTICLES_BY_WRITER = gql`
 
 export const GET_DRAFT_BY_WRITER = gql`
     query GetDraftByWriter($writerId: ID!){
-        draftByWriter(writerId: $writerId){
+        draftsByWriter(writerId: $writerId){
             ...ArticleFields
         }
     }
