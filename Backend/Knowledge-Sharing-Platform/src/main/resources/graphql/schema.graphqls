@@ -20,6 +20,12 @@ type Article {
     status: String!
     writerId: ID!
     publishedAt: String
+    excerpt: String
+    coverImageUrl: String
+    tags: String
+    readTime: Int
+    createdAt: String
+    updatedAt: String
 }
 
 type Notification {
@@ -54,6 +60,10 @@ input ArticleInput {
     content: String
     writerId: ID!
     status: String
+    excerpt: String
+    coverImageUrl: String
+    tags: String
+    readTime: Int
 }
 
 input WriterInput {

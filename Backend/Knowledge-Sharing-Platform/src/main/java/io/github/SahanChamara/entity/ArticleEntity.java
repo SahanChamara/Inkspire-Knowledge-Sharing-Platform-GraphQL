@@ -28,5 +28,23 @@ public class ArticleEntity {
     private Long writerId;
 
     @Column(name = "published_at")
-        private LocalDateTime publishedAt;
+    private LocalDateTime publishedAt;
+
+    @Column(name = "excerpt")
+    private String excerpt;
+
+    @Column(name = "cover_image")
+    private String coverImageUrl;
+
+    @Column(name = "tags")
+    private String[] tags;
+
+    @Column(name = "read_time")
+    private Integer readTime;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

@@ -9,6 +9,10 @@ export const ARTICLE_FRAGMENT = gql`
         status
         writerId
         publishedAt
+        excerpt
+        coverImageUrl
+        tags
+        readTime
     }
 `;
 
@@ -77,6 +81,10 @@ export const GET_ARTICLE_BY_ID = gql`
             status
             writerId
             publishAt
+            excerpt
+            coverImageUrl
+            tags
+            readTime
         }
     }
 `

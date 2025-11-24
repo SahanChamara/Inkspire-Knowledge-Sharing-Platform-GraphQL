@@ -5,6 +5,10 @@ export type Article = {
     status: string;
     writerId: string;
     publishedAt: string;
+    excerpt: string;
+    coverImageUrl: string;
+    tags: string;
+    readTime: number;
 }
 
 

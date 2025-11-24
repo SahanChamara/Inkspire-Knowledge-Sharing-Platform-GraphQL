@@ -17,4 +17,10 @@ public class Article {
     private String status;
     private Long writerId;
     private LocalDateTime publishedAt;
+    private String excerpt;
+    private String coverImageUrl;
+    private String[] tags;
+    private Integer readTime;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

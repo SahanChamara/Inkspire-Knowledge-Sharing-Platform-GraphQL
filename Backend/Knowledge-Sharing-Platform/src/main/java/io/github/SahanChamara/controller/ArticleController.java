@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +31,8 @@ public class ArticleController {
     @MutationMapping
     public Article addArticle(@Argument("input") Article articleInput){
         return articleService.addArticle(new Article(null, articleInput.getTitle(),
-                articleInput.getContent(), articleInput.getStatus(), articleInput.getWriterId(),articleInput.getPublishedAt()));
+                articleInput.getContent(), articleInput.getStatus(), articleInput.getWriterId(),articleInput.getPublishedAt(), articleInput.getExcerpt(), articleInput.getCoverImageUrl(),
+                articleInput.getTags(), articleInput.getReadTime(), LocalDateTime.now(), LocalDateTime.now()));
 
     }
 
@@ -42,7 +44,8 @@ public class ArticleController {
     @MutationMapping
     public Article updateArticle(@Argument Long id, @Argument("input") Article articleInput){
         return articleService.updateArticle(id, new Article(null,articleInput.getTitle(),
-                articleInput.getContent(), articleInput.getStatus(), articleInput.getWriterId(), articleInput.getPublishedAt()));
+                articleInput.getContent(), articleInput.getStatus(), articleInput.getWriterId(), articleInput.getPublishedAt(), articleInput.getExcerpt(), articleInput.getCoverImageUrl(),
+                articleInput.getTags(), articleInput.getReadTime(), articleInput.getCreatedAt(), LocalDateTime.now()));
     }
 
     @MutationMapping
