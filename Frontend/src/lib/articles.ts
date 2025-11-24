@@ -1,32 +1,42 @@
-import { supabase, Article, ArticleWithWriter } from './supabase';
+// import { supabase, Article, ArticleWithWriter } from './supabase';
+
+import { apolloClient } from "./apllo";
+import { GET_ARTICLE_BY_ID, GET_PUBLISHED_BY_WRITER } from "./operations";
+import { Article, Writer } from "./types";
 
 export const articleService = {
-  async getPublishedArticles(): Promise<ArticleWithWriter[]> {
-    const { data, error } = await supabase
-      .from('articles')
-      .select(`
-        *,
-        profiles (*)
-      `)
-      .eq('status', 'PUBLISHED')
-      .order('published_at', { ascending: false });
+  async getPublishedArticles(writerId: string): Promise<Article[]> {
+    const result  = await apolloClient.query<
+    {publishedByWriter: Article[]},
+    { writerId: string }
+    >({
+      query: GET_PUBLISHED_BY_WRITER,
+      variables: {writerId: writerId},
+      fetchPolicy: "network-only",
+    });
 
-    if (error) throw error;
-    return data as ArticleWithWriter[];
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    return result.data?.publishedByWriter ?? [];
   },
 
-  async getArticleById(id: string): Promise<ArticleWithWriter | null> {
-    const { data, error } = await supabase
-      .from('articles')
-      .select(`
-        *,
-        profiles (*)
-      `)
-      .eq('id', id)
-      .maybeSingle();
+  async getArticleById(id: string): Promise<Article | null> {
+    const result = await apolloClient.query<
+    {articleById: Article},
+    {id: string}
+    >({
+      query: GET_ARTICLE_BY_ID,
+      variables: {id:id},
+      fetchPolicy: "network-only"
+    });
 
-    if (error) throw error;
-    return data as ArticleWithWriter | null;
+    if(result.error){
+      throw new Error(result.error.message);
+    }
+
+    return result.data?.articleById ?? null;
   },
 
   async getArticlesByWriter(writerId: string): Promise<Article[]> {

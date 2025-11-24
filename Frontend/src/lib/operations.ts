@@ -8,7 +8,7 @@ export const ARTICLE_FRAGMENT = gql`
         content
         status
         writerId
-        publishAt
+        publishedAt
     }
 `;
 
