@@ -13,6 +13,7 @@ export const ARTICLE_FRAGMENT = gql`
         coverImageUrl
         tags
         readTime
+        updatedAt
     }
 `;
 
@@ -186,8 +187,8 @@ export const PUBLISHED_ARTICLE = gql`
     ${ARTICLE_FRAGMENT}
 `;
 
-export const DELETE_ARTILE = gql`
-    mutation DeleteArticle($id: ID){
+export const DELETE_ARTICLE = gql`
+    mutation DeleteArticle($id: ID!){
         deleteArticle(id: $id)
     }
 `

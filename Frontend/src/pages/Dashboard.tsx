@@ -8,7 +8,8 @@ import { Modal } from '../components/ui/Modal';
 import { FileText, CheckCircle, User, BarChart3, PenSquare } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { articleService } from '../lib/articles';
-import { Article } from '../lib/supabase';
+import { Article } from '../lib/types';
+// import { Article } from '../lib/supabase';
 
 export const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('drafts');
@@ -108,11 +109,11 @@ export const Dashboard: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-6 pt-6 border-t border-gray-200">
                     <div className="text-center">
-                      <p className="text-3xl font-bold text-gray-900">{profile.article_count}</p>
+                      <p className="text-3xl font-bold text-gray-900">{profile.articleCount}</p>
                       <p className="text-gray-600 mt-1">Articles</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-3xl font-bold text-gray-900">{profile.follower_count}</p>
+                      <p className="text-3xl font-bold text-gray-900">{profile.followersCount}</p>
                       <p className="text-gray-600 mt-1">Followers</p>
                     </div>
                     <div className="text-center">
@@ -140,7 +141,7 @@ export const Dashboard: React.FC = () => {
                       id={draft.id}
                       title={draft.title}
                       excerpt={draft.excerpt || articleService.generateExcerpt(draft.content)}
-                      lastEdited={draft.updated_at}
+                      lastEdited={draft.updatedAt}
                       status="DRAFT"
                       tags={draft.tags}
                       onDelete={handleDelete}
@@ -165,7 +166,7 @@ export const Dashboard: React.FC = () => {
                       id={article.id}
                       title={article.title}
                       excerpt={article.excerpt || articleService.generateExcerpt(article.content)}
-                      lastEdited={article.updated_at}
+                      lastEdited={article.updatedAt}
                       status="PUBLISHED"
                       tags={article.tags}
                       onDelete={handleDelete}
