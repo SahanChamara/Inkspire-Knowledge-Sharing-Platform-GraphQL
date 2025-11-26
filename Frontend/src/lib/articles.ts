@@ -3,13 +3,13 @@ import { ADD_ARTICLE, DELETE_ARTICLE, GET_ARTICLE_BY_ID, GET_ARTICLES, GET_ARTIC
 import { Article } from "./types";
 
 export const articleService = {
-  async getPublishedArticles(status: string): Promise<Article[]> {
+  async getPublishedArticles(status: string | null): Promise<Article[]> {
     const result  = await apolloClient.query<
     {articles: Article[]},
-    {status: string}
+    {status: string | null}
     >({
       query: GET_ARTICLES,
-      variables: {status: status},
+      variables: {status},
       fetchPolicy: "network-only",
     });
 

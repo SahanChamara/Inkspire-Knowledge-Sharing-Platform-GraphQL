@@ -45,7 +45,7 @@ export const ArticleDetail: React.FC = () => {
         setIsFollowing(following);
       }
 
-      const allArticles = await articleService.getPublishedArticles();
+      const allArticles = await articleService.getPublishedArticles(null);
       const related = allArticles
         .filter((a) => a.id !== id && a.tags.some((tag) => articleData.tags.includes(tag)))
         .slice(0, 2);
