@@ -1,7 +1,7 @@
 // import { supabase, Article, ArticleWithWriter } from './supabase';
 
 import { apolloClient } from "./apllo";
-import { ADD_ARTICLE, GET_ARTICLE_BY_ID, GET_ARTICLES, GET_ARTICLES_BY_WRITER, GET_DRAFT_BY_WRITER, GET_PUBLISHED_BY_WRITER, PUBLISHED_ARTICLE, UPDATEARTICLE } from "./operations";
+import { ADD_ARTICLE, DELETE_ARTILE, GET_ARTICLE_BY_ID, GET_ARTICLES, GET_ARTICLES_BY_WRITER, GET_DRAFT_BY_WRITER, GET_PUBLISHED_BY_WRITER, PUBLISHED_ARTICLE, UPDATEARTICLE } from "./operations";
 import { Article } from "./types";
 
 export const articleService = {
@@ -161,13 +161,21 @@ export const articleService = {
     return article;
   },
 
-  async deleteArticle(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('articles')
-      .delete()
-      .eq('id', id);
+  async deleteArticle(id: string): Promise<boolean> {
+    const result = await apolloClient.mutate<
+    {deleteArticle: boolean},
+    {id: string}
+    >({
+      mutation: DELETE_ARTILE,
+      variables: {id}
+    });
 
-    if (error) throw error;
+    if(result.error){
+      throw new Error(result.error.message);
+    }
+
+
+    return result.data?.deleteArticle ?? false;
   },
 
   calculateReadTime(content: string): number {

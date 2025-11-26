@@ -186,6 +186,12 @@ export const PUBLISHED_ARTICLE = gql`
     ${ARTICLE_FRAGMENT}
 `;
 
+export const DELETE_ARTILE = gql`
+    mutation DeleteArticle($id: ID){
+        deleteArticle(id: $id)
+    }
+`
+
 export const FOLLOW_WRITER = gql`
     mutation FollowWriter($targetId: ID!, $followerId: ID!){
         followWriter(targetId: $targetId, followerId: $followerId)
