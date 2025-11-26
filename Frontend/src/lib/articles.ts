@@ -1,7 +1,7 @@
 // import { supabase, Article, ArticleWithWriter } from './supabase';
 
 import { apolloClient } from "./apllo";
-import { ADD_ARTICLE, GET_ARTICLE_BY_ID, GET_ARTICLES, GET_ARTICLES_BY_WRITER, GET_DRAFT_BY_WRITER, GET_PUBLISHED_BY_WRITER } from "./operations";
+import { ADD_ARTICLE, GET_ARTICLE_BY_ID, GET_ARTICLES, GET_ARTICLES_BY_WRITER, GET_DRAFT_BY_WRITER, GET_PUBLISHED_BY_WRITER, UPDATEARTICLE } from "./operations";
 import { Article } from "./types";
 
 export const articleService = {
@@ -120,15 +120,24 @@ export const articleService = {
   },
 
   async updateArticle(id: string, updates: Partial<Article>): Promise<Article> {
-    const { data, error } = await supabase
-      .from('articles')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    const result = await apolloClient.mutate<
+    {updateArticle: Article},
+    {id: string; updates: Partial<Article>}
+    >({
+      mutation: UPDATEARTICLE,
+      variables: {id, updates}
+    });
 
-    if (error) throw error;
-    return data;
+    if(result.error){
+      throw new Error(result.error.message)
+    }
+
+    const article: Article | undefined = result.data?.updateArticle;
+    if(!article){
+      throw new Error("Error Updating Article");
+    }
+
+    return article;
   },
 
   async publishArticle(id: string): Promise<Article> {
