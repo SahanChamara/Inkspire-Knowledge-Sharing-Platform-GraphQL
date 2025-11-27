@@ -18,7 +18,8 @@ export const Editor: React.FC = () => {
   const [content, setContent] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
-  const [coverImage, setCoverImage] = useState('');
+  const [coverImageUrl, setCoverImage] = useState('');
+  const [status, setStatus] = useState('');
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -35,12 +36,13 @@ export const Editor: React.FC = () => {
   const loadArticle = async (articleId: string) => {
     try {
       const article = await articleService.getArticleById(articleId);
-      if (article && article.writer_id === profile?.id) {
+      if (article && article.writerId === profile?.id) {
         setTitle(article.title);
         setContent(article.content);
         setTags(article.tags);
-        setCoverImage(article.cover_image || '');
+        setCoverImage(article.coverImageUrl || '');
         setArticleId(article.id);
+        setStatus(article.status);
       }
     } catch (error) {
       console.error('Error loading article:', error);
@@ -70,19 +72,21 @@ export const Editor: React.FC = () => {
           title,
           content,
           excerpt,
-          cover_image: coverImage || null,
+          coverImageUrl,
           tags,
-          read_time: readTime,
+          status,
+          readTime: readTime,
         });
       } else {
         const newArticle = await articleService.createArticle({
-          writer_id: profile.id,
+          writerId: profile.id,
           title,
           content,
           excerpt,
-          cover_image: coverImage || undefined,
+          coverImageUrl,
           tags,
-          read_time: readTime,
+          status: "DRAFT",
+          readTime: readTime,
         });
         setArticleId(newArticle.id);
       }
@@ -93,6 +97,9 @@ export const Editor: React.FC = () => {
       setSaving(false);
     }
   };
+
+  console.log("cover image", coverImageUrl);
+  
 
   const handleSaveDraft = async () => {
     if (!profile || !title.trim()) {
@@ -110,19 +117,21 @@ export const Editor: React.FC = () => {
           title,
           content,
           excerpt,
-          cover_image: coverImage || null,
+          coverImageUrl,
+          status: "DRAFT",
           tags,
-          read_time: readTime,
+          readTime: readTime,
         });
       } else {
         const newArticle = await articleService.createArticle({
-          writer_id: profile.id,
+          writerId: profile.id,
           title,
           content,
           excerpt,
-          cover_image: coverImage || undefined,
+          coverImageUrl,
+          status: "DRAFT",
           tags,
-          read_time: readTime,
+          readTime: readTime,
         });
         setArticleId(newArticle.id);
       }
@@ -159,20 +168,22 @@ export const Editor: React.FC = () => {
           title,
           content,
           excerpt,
-          cover_image: coverImage || null,
+          coverImageUrl,
           tags,
-          read_time: readTime,
+          status: "PUBLISHED",
+          readTime: readTime,
         });
         await articleService.publishArticle(articleId);
       } else {
         const newArticle = await articleService.createArticle({
-          writer_id: profile.id,
+          writerId: profile.id,
           title,
           content,
           excerpt,
-          cover_image: coverImage || undefined,
+          coverImageUrl,
           tags,
-          read_time: readTime,
+          status: "PUBLISHED",
+          readTime: readTime,
         });
         publishedArticleId = newArticle.id;
         await articleService.publishArticle(newArticle.id);
@@ -268,12 +279,12 @@ export const Editor: React.FC = () => {
                 </label>
                 <Input
                   placeholder="https://example.com/image.jpg"
-                  value={coverImage}
+                  value={coverImageUrl}
                   onChange={(e) => setCoverImage(e.target.value)}
                 />
-                {coverImage && (
+                {coverImageUrl && (
                   <div className="mt-3 rounded-lg overflow-hidden">
-                    <img src={coverImage} alt="Cover preview" className="w-full h-32 object-cover" />
+                    <img src={coverImageUrl} alt="Cover preview" className="w-full h-32 object-cover" />
                   </div>
                 )}
               </div>
@@ -334,8 +345,8 @@ export const Editor: React.FC = () => {
       >
         <div className="space-y-4">
           <h1 className="text-3xl font-bold text-gray-900">{title || 'Untitled Article'}</h1>
-          {coverImage && (
-            <img src={coverImage} alt="Cover" className="w-full h-64 object-cover rounded-lg" />
+          {coverImageUrl && (
+            <img src={coverImageUrl} alt="Cover" className="w-full h-64 object-cover rounded-lg" />
           )}
           <div className="prose max-w-none">
             <div dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, '<br />') }} />

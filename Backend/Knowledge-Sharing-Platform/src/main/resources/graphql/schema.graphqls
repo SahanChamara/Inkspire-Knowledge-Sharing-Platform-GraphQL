@@ -22,7 +22,7 @@ type Article {
     publishedAt: String
     excerpt: String
     coverImageUrl: String
-    tags: String
+    tags: [String]
     readTime: Int
     createdAt: String
     updatedAt: String
@@ -62,7 +62,7 @@ input ArticleInput {
     status: String
     excerpt: String
     coverImageUrl: String
-    tags: String
+    tags: [String]
     readTime: Int
 }
 

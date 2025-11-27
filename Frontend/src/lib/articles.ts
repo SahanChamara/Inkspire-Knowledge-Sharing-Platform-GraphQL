@@ -89,17 +89,18 @@ export const articleService = {
   },
 
   async createArticle(input: {
-    writer_id: string,
+    writerId: string,
     title: string,
     content: string,
     excerpt: string,
     coverImageUrl: string,
     tags: string[],
+    status: string,
     readTime: number,
   }): Promise<Article> {
     const result = await apolloClient.mutate<
     {addArticle: Article},
-    {input: {writer_id: string; title: string; content: string; excerpt: string; coverImageUrl: string; tags: string[]; readTime: number}}
+    {input: {writerId: string; title: string; content: string; excerpt: string; coverImageUrl: string; tags: string[]; status: string; readTime: number}}
     >({
       mutation: ADD_ARTICLE,
       variables: {input}

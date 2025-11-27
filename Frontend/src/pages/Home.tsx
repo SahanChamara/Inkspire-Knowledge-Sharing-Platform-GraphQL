@@ -20,7 +20,7 @@ export const Home: React.FC = () => {
   const loadArticles = async () => {
     setLoading(true);
     try {
-      const data = await articleService.getPublishedArticles();
+      const data = await articleService.getPublishedArticles("PUBLISHED");
       setArticles(data);
     } catch (error) {
       console.error('Error loading articles:', error);

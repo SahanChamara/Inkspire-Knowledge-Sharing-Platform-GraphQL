@@ -36,7 +36,8 @@ public class ArticleEntity {
     @Column(name = "cover_image")
     private String coverImageUrl;
 
-    @Column(name = "tags")
+    @ElementCollection
+    @Column(name = "tags", columnDefinition = "json")
     private String[] tags;
 
     @Column(name = "read_time")
