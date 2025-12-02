@@ -8,8 +8,7 @@ import { Modal } from '../components/ui/Modal';
 import { FileText, CheckCircle, User, BarChart3, PenSquare } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { articleService } from '../lib/articles';
-import { Article } from '../lib/supabase';
-
+import { Article } from '../lib/types';
 export const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('drafts');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -108,11 +107,11 @@ export const Dashboard: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-6 pt-6 border-t border-gray-200">
                     <div className="text-center">
-                      <p className="text-3xl font-bold text-gray-900">{profile.article_count}</p>
+                      <p className="text-3xl font-bold text-gray-900">{profile.articleCount}</p>
                       <p className="text-gray-600 mt-1">Articles</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-3xl font-bold text-gray-900">{profile.follower_count}</p>
+                      <p className="text-3xl font-bold text-gray-900">{profile.followersCount}</p>
                       <p className="text-gray-600 mt-1">Followers</p>
                     </div>
                     <div className="text-center">

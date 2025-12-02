@@ -7,13 +7,13 @@ export type Article = {
     publishedAt: string;
     excerpt: string;
     coverImageUrl: string;
-    tags: string;
+    tags: string[];
     readTime: number;
 }
 
 
 export type Writer = {
-    id: number;
+    id: string;
     name: string;
     bio: string;
     email: string;

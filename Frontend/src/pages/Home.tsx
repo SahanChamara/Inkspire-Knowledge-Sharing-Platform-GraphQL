@@ -5,13 +5,16 @@ import { FeedFilter } from '../components/article/FeedFilter';
 import { ArticleCardSkeleton } from '../components/ui/Skeleton';
 import { Sparkles } from 'lucide-react';
 import { articleService } from '../lib/articles';
-import { ArticleWithWriter } from '../lib/supabase';
+// import { ArticleWithWriter } from '../lib/supabase';
+import { Article, Writer } from '../lib/types';
+import { authService } from '../lib/auth';
 
 export const Home: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'trending'>('newest');
   const [loading, setLoading] = useState(true);
-  const [articles, setArticles] = useState<ArticleWithWriter[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [writer, setWriter] = useState<Writer>();
 
   useEffect(() => {
     loadArticles();
@@ -20,7 +23,7 @@ export const Home: React.FC = () => {
   const loadArticles = async () => {
     setLoading(true);
     try {
-      const data = await articleService.getPublishedArticles();
+      const data = await articleService.getPublishedArticles("PUBLISHED");
       setArticles(data);
     } catch (error) {
       console.error('Error loading articles:', error);
@@ -28,6 +31,15 @@ export const Home: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const getWriterById = async (id: string) => {
+    try {
+      const data = await authService.getProfileById(id);
+      setWriter(data);
+    } catch (error) {
+      console.error("Error fetching Writer", error);
+    }
+  }
 
   const allTags = Array.from(new Set(articles.flatMap((article) => article.tags)));
 
@@ -76,11 +88,11 @@ export const Home: React.FC = () => {
               id={article.id}
               title={article.title}
               excerpt={article.excerpt || articleService.generateExcerpt(article.content)}
-              author={{ id: article.profiles.id, name: article.profiles.name }}
-              publishedAt={article.published_at!}
-              readTime={article.read_time}
+              author={{ id: article.profile.id, name: article.profiles.name }}
+              publishedAt={article.publishedAt!}
+              readTime={article.readTime}
               tags={article.tags}
-              coverImage={article.cover_image || undefined}
+              coverImage={article.coverImageUrl || undefined}
             />
           ))
         )}
