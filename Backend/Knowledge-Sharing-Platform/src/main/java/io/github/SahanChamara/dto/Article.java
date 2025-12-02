@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,7 +20,7 @@ public class Article {
     private LocalDateTime publishedAt;
     private String excerpt;
     private String coverImageUrl;
-    private String[] tags;
+    private List<String> tags;
     private Integer readTime;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

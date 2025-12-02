@@ -1,17 +1,15 @@
-// import { supabase, Article, ArticleWithWriter } from './supabase';
-
 import { apolloClient } from "./apllo";
-import { ADD_ARTICLE, GET_ARTICLE_BY_ID, GET_ARTICLES, GET_ARTICLES_BY_WRITER, GET_DRAFT_BY_WRITER, GET_PUBLISHED_BY_WRITER } from "./operations";
+import { ADD_ARTICLE, DELETE_ARTICLE, GET_ARTICLE_BY_ID, GET_ARTICLES, GET_ARTICLES_BY_WRITER, GET_DRAFT_BY_WRITER, GET_PUBLISHED_BY_WRITER, PUBLISHED_ARTICLE, UPDATEARTICLE } from "./operations";
 import { Article } from "./types";
 
 export const articleService = {
-  async getPublishedArticles(status: string): Promise<Article[]> {
+  async getPublishedArticles(status: string | null): Promise<Article[]> {
     const result  = await apolloClient.query<
     {articles: Article[]},
-    {status: string}
+    {status: string | null}
     >({
       query: GET_ARTICLES,
-      variables: {status: status},
+      variables: {status},
       fetchPolicy: "network-only",
     });
 
@@ -91,17 +89,18 @@ export const articleService = {
   },
 
   async createArticle(input: {
-    writer_id: string,
+    writerId: string,
     title: string,
     content: string,
     excerpt: string,
     coverImageUrl: string,
     tags: string[],
+    status: string,
     readTime: number,
   }): Promise<Article> {
     const result = await apolloClient.mutate<
     {addArticle: Article},
-    {input: {writer_id: string; title: string; content: string; excerpt: string; coverImageUrl: string; tags: string[]; readTime: number}}
+    {input: {writerId: string; title: string; content: string; excerpt: string; coverImageUrl: string; tags: string[]; status: string; readTime: number}}
     >({
       mutation: ADD_ARTICLE,
       variables: {input}
@@ -120,39 +119,61 @@ export const articleService = {
   },
 
   async updateArticle(id: string, updates: Partial<Article>): Promise<Article> {
-    const { data, error } = await supabase
-      .from('articles')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    const result = await apolloClient.mutate<
+    {updateArticle: Article},
+    {id: string; updates: Partial<Article>}
+    >({
+      mutation: UPDATEARTICLE,
+      variables: {id, updates}
+    });
 
-    if (error) throw error;
-    return data;
+    if(result.error){
+      throw new Error(result.error.message)
+    }
+
+    const article: Article | undefined = result.data?.updateArticle;
+    if(!article){
+      throw new Error("Error Updating Article");
+    }
+
+    return article;
   },
 
   async publishArticle(id: string): Promise<Article> {
-    const { data, error } = await supabase
-      .from('articles')
-      .update({
-        status: 'PUBLISHED',
-        published_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .select()
-      .single();
+    const result = await apolloClient.mutate<
+    {publishArticle: Article},
+    {id: string}
+    >({
+      mutation: PUBLISHED_ARTICLE,
+      variables: {id}
+    });
 
-    if (error) throw error;
-    return data;
+    if(result.error){
+      throw new Error(result.error.message);
+    }
+
+    const article: Article | undefined = result.data?.publishArticle;
+    if(!article){
+      throw new Error("Error Updating Article");
+    }
+    
+    return article;
   },
 
-  async deleteArticle(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('articles')
-      .delete()
-      .eq('id', id);
+  async deleteArticle(id: string): Promise<boolean> {
+    const result = await apolloClient.mutate<
+    {deleteArticle: boolean},
+    {id: string}
+    >({
+      mutation: DELETE_ARTICLE,
+      variables: {id}
+    });
 
-    if (error) throw error;
+    if(result.error){
+      throw new Error(result.error.message);
+    }
+
+    return result.data?.deleteArticle ?? false;
   },
 
   calculateReadTime(content: string): number {

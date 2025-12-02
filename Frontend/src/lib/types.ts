@@ -8,6 +8,7 @@ export type Article = {
     excerpt: string;
     coverImageUrl: string;
     tags: string[];
+    updatedAt: string;
     readTime: number;
 }
 

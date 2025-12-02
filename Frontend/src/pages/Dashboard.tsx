@@ -9,6 +9,8 @@ import { FileText, CheckCircle, User, BarChart3, PenSquare } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext';
 import { articleService } from '../lib/articles';
 import { Article } from '../lib/types';
+// import { Article } from '../lib/supabase';
+
 export const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('drafts');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -139,7 +141,7 @@ export const Dashboard: React.FC = () => {
                       id={draft.id}
                       title={draft.title}
                       excerpt={draft.excerpt || articleService.generateExcerpt(draft.content)}
-                      lastEdited={draft.updated_at}
+                      lastEdited={draft.updatedAt}
                       status="DRAFT"
                       tags={draft.tags}
                       onDelete={handleDelete}
@@ -164,7 +166,7 @@ export const Dashboard: React.FC = () => {
                       id={article.id}
                       title={article.title}
                       excerpt={article.excerpt || articleService.generateExcerpt(article.content)}
-                      lastEdited={article.updated_at}
+                      lastEdited={article.updatedAt}
                       status="PUBLISHED"
                       tags={article.tags}
                       onDelete={handleDelete}
