@@ -85,6 +85,11 @@ public class ArticleController {
         return articleService.findArticleByWriterIds(writerIdList);
     }
 
+    @BatchMapping(typeName = "Article", field = "writer")
+    public Map<Long, Writer> writer(List<Article> articles){
+
+    }
+
     @SubscriptionMapping
     public Flux<Article> articlePublished(){
         return articlePublisher.getPublisher();

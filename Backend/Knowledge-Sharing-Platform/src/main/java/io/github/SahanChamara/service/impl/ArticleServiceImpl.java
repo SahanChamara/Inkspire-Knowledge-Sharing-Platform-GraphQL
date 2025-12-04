@@ -5,11 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.SahanChamara.dto.Article;
 import io.github.SahanChamara.dto.ArticleNotificationPayload;
 import io.github.SahanChamara.dto.Notification;
+import io.github.SahanChamara.dto.Writer;
 import io.github.SahanChamara.entity.ArticleEntity;
+import io.github.SahanChamara.entity.WriterEntity;
 import io.github.SahanChamara.publisher.ArticlePublisher;
 import io.github.SahanChamara.publisher.NotificationPublisher;
 import io.github.SahanChamara.repository.ArticleRepository;
 import io.github.SahanChamara.repository.FollowRepository;
+import io.github.SahanChamara.repository.WriterRepository;
 import io.github.SahanChamara.service.ArticleService;
 import io.github.SahanChamara.service.NotificationService;
 import io.github.SahanChamara.util.ArticleStatus;
@@ -33,6 +36,7 @@ public class ArticleServiceImpl implements ArticleService {
     private final ArticleRepository articleRepository;
     private final FollowRepository followRepository;
     private final NotificationService notificationService;
+    private final WriterRepository writerRepository;
     private final ModelMapper mapper;
     private final ArticlePublisher articlePublisher;
     private final NotificationPublisher notificationPublisher;
@@ -151,7 +155,29 @@ public class ArticleServiceImpl implements ArticleService {
         return group;
     }
 
-//   This is helper method for clear structuring for notification payload
+    @Override
+    public Map<Long, Writer> getWriterByArticles(List<Article> articles) {
+        List<Long> writerIds = articles.stream()
+                .map(Article::getWriterId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        if(writerIds.isEmpty()){
+            return Collections.emptyMap();
+        }
+
+        List<WriterEntity> writerEntities = writerRepository.findByIdIn(writerIds);
+        Map<Long, Writer> map = writerEntities.stream()
+                .map(writerEntity -> mapper.map(writerEntity, Writer.class))
+                .collect(Collectors.toMap(Writer::getId, writer -> writer));
+
+        writerIds.forEach(id -> map.putIfAbsent(id, null));
+        return map;
+
+    }
+
+    //   This is helper method for clear structuring for notification payload
     @Override
     public String buildPayloadForArticle(ArticleEntity article) {
         ArticleNotificationPayload payload = new ArticleNotificationPayload(
