@@ -7,14 +7,14 @@ import { Sparkles } from 'lucide-react';
 import { articleService } from '../lib/articles';
 // import { ArticleWithWriter } from '../lib/supabase';
 import { Article, Writer } from '../lib/types';
-import { authService } from '../lib/auth';
+// import { authService } from '../lib/auth';
 
 export const Home: React.FC = () => {
   const [selectedTag, setSelectedTag] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'trending'>('newest');
   const [loading, setLoading] = useState(true);
   const [articles, setArticles] = useState<Article[]>([]);
-  const [writer, setWriter] = useState<Writer>();
+  // const [writer, setWriter] = useState<Writer>();
 
   useEffect(() => {
     loadArticles();
@@ -32,14 +32,16 @@ export const Home: React.FC = () => {
     }
   };
 
-  const getWriterById = async (id: string) => {
+/*   const getWriterById = async (id: string) => {
     try {
       const data = await authService.getProfileById(id);
-      setWriter(data);
+      if(data){
+        setWriter(data);
+      }
     } catch (error) {
       console.error("Error fetching Writer", error);
     }
-  }
+  } */
 
   const allTags = Array.from(new Set(articles.flatMap((article) => article.tags)));
 
