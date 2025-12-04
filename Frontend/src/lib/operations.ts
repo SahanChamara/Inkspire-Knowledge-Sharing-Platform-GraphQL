@@ -14,6 +14,11 @@ export const ARTICLE_FRAGMENT = gql`
         tags
         readTime
         updatedAt
+        writer {
+            id
+            name
+
+        }
     }
 `;
 

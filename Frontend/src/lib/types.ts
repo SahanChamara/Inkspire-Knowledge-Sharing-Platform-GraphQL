@@ -10,6 +10,7 @@ export type Article = {
     tags: string[];
     updatedAt: string;
     readTime: number;
+    writer: Writer;
 }
 
 

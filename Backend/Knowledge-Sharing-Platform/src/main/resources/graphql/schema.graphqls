@@ -26,6 +26,7 @@ type Article {
     readTime: Int
     createdAt: String
     updatedAt: String
+    writer: Writer!
 }
 
 type Notification {

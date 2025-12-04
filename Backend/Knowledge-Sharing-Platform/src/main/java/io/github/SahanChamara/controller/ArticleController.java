@@ -87,7 +87,7 @@ public class ArticleController {
 
     @BatchMapping(typeName = "Article", field = "writer")
     public Map<Long, Writer> writer(List<Article> articles){
-
+        return articleService.getWriterByArticles(articles);
     }
 
     @SubscriptionMapping

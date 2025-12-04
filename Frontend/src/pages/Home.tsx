@@ -6,7 +6,7 @@ import { ArticleCardSkeleton } from '../components/ui/Skeleton';
 import { Sparkles } from 'lucide-react';
 import { articleService } from '../lib/articles';
 // import { ArticleWithWriter } from '../lib/supabase';
-import { Article, Writer } from '../lib/types';
+import { Article } from '../lib/types';
 // import { authService } from '../lib/auth';
 
 export const Home: React.FC = () => {
@@ -90,7 +90,7 @@ export const Home: React.FC = () => {
               id={article.id}
               title={article.title}
               excerpt={article.excerpt || articleService.generateExcerpt(article.content)}
-              author={{ id: article.profile.id, name: article.profiles.name }}
+              author={{ id: article.writer.id, name: article.writer.name }}
               publishedAt={article.publishedAt!}
               readTime={article.readTime}
               tags={article.tags}
