@@ -1,11 +1,11 @@
 package io.github.SahanChamara.entity;
 
+import io.github.SahanChamara.util.ArticleStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,7 +22,8 @@ public class ArticleEntity {
     @Column(length = 5000)
     private String content;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ArticleStatus status;
 
     @Column(name = "writerId")
     private Long writerId;
@@ -33,12 +34,12 @@ public class ArticleEntity {
     @Column(name = "excerpt")
     private String excerpt;
 
-    @Column(name = "cover_image")
+    @Column(name = "cover_image_url")
     private String coverImageUrl;
 
-    @ElementCollection
-    @Column(name = "tags", columnDefinition = "json")
-    private String[] tags;
+    @Column(columnDefinition = "json")
+    @jakarta.persistence.Convert(converter = io.github.SahanChamara.util.StringListConverter.class)
+    private java.util.List<String> tags;
 
     @Column(name = "read_time")
     private Integer readTime;

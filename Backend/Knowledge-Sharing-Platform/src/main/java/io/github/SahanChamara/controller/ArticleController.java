@@ -30,6 +30,9 @@ public class ArticleController {
 
     @MutationMapping
     public Article addArticle(@Argument("input") Article articleInput){
+
+        logger.debug("Cover Image Url: {}", articleInput.getCoverImageUrl());
+
         return articleService.addArticle(new Article(null, articleInput.getTitle(),
                 articleInput.getContent(), articleInput.getStatus(), articleInput.getWriterId(),articleInput.getPublishedAt(), articleInput.getExcerpt(), articleInput.getCoverImageUrl(),
                 articleInput.getTags(), articleInput.getReadTime(), LocalDateTime.now(), LocalDateTime.now()));

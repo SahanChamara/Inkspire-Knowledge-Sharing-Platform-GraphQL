@@ -45,6 +45,9 @@ export const Dashboard: React.FC = () => {
     }
   };
 
+  console.log("Draft Datas",drafts);
+  
+
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: <User size={18} /> },

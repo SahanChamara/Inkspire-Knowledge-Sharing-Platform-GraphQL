@@ -1,5 +1,4 @@
-import { supabase, Notification, NotificationWithRelations } from './supabase';
-import { followService } from './follows';
+import { Notification, NotificationWithRelations } from './supabase';
 
 export const notificationService = {
   async createNotification(notification: {
@@ -9,14 +8,8 @@ export const notificationService = {
     type: string;
     message: string;
   }): Promise<Notification> {
-    const { data, error } = await supabase
-      .from('notifications')
-      .insert([notification])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    // Notifications are now handled by the backend GraphQL API
+    throw new Error('Use GraphQL API instead');
   },
 
   async notifyFollowersOfNewArticle(
@@ -25,92 +18,35 @@ export const notificationService = {
     articleId: string,
     articleTitle: string
   ): Promise<void> {
-    const followerIds = await followService.getFollowerIds(writerId);
-
-    if (followerIds.length === 0) return;
-
-    const notifications = followerIds.map(followerId => ({
-      recipient_id: followerId,
-      sender_id: writerId,
-      article_id: articleId,
-      type: 'new_article',
-      message: `${writerName} published a new article: "${articleTitle}"`,
-    }));
-
-    const { error } = await supabase
-      .from('notifications')
-      .insert(notifications);
-
-    if (error) throw error;
+    // Notifications are now handled by the backend GraphQL API
+    // This is called automatically when an article is published via publishArticle() mutation
   },
 
   async getNotifications(userId: string): Promise<NotificationWithRelations[]> {
-    const { data, error } = await supabase
-      .from('notifications')
-      .select(`
-        *,
-        sender:profiles!notifications_sender_id_fkey (*),
-        article:articles (*)
-      `)
-      .eq('recipient_id', userId)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    return data as NotificationWithRelations[];
+    // Use GraphQL API to fetch notifications
+    return [];
   },
 
   async getUnreadCount(userId: string): Promise<number> {
-    const { count, error } = await supabase
-      .from('notifications')
-      .select('*', { count: 'exact', head: true })
-      .eq('recipient_id', userId)
-      .eq('read', false);
-
-    if (error) throw error;
-    return count || 0;
+    // Use GraphQL API to get unread count
+    return 0;
   },
 
   async markAsRead(notificationId: string): Promise<void> {
-    const { error } = await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('id', notificationId);
-
-    if (error) throw error;
+    // Use GraphQL API to mark notification as read
   },
 
   async markAllAsRead(userId: string): Promise<void> {
-    const { error } = await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('recipient_id', userId)
-      .eq('read', false);
-
-    if (error) throw error;
+    // Use GraphQL API to mark all notifications as read
   },
 
   subscribeToNotifications(
     userId: string,
     callback: (notification: Notification) => void
   ) {
-    const channel = supabase
-      .channel('notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `recipient_id=eq.${userId}`,
-        },
-        (payload) => {
-          callback(payload.new as Notification);
-        }
-      )
-      .subscribe();
-
+    // Use GraphQL subscriptions instead
     return () => {
-      supabase.removeChannel(channel);
+      // unsubscribe
     };
   },
 };

@@ -19,8 +19,6 @@ import io.github.SahanChamara.util.ArticleStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,18 +38,13 @@ public class ArticleServiceImpl implements ArticleService {
     private final ModelMapper mapper;
     private final ArticlePublisher articlePublisher;
     private final NotificationPublisher notificationPublisher;
-    private static final Logger logger = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
     @Override
     @Transactional
     public Article addArticle(Article article) {
-        if (article != null && article.getStatus().equalsIgnoreCase("DRAFT")) {
+        if (article != null && article.getStatus().equals(ArticleStatus.DRAFT)) {
             return mapper.map(articleRepository.save(mapper.map(article, ArticleEntity.class)), Article.class);
         }
-
-/*        return article != null && article.getStatus().equalsIgnoreCase("PUBLISHED")
-                ? publishArticle(article.getId())
-                : null;*/
         return null;
     }
 
@@ -126,7 +119,9 @@ public class ArticleServiceImpl implements ArticleService {
         if (id != null && article != null) {
             Optional<ArticleEntity> isExist = articleRepository.findById(id);
             if (isExist.isPresent()) {
-                return mapper.map(articleRepository.save(mapper.map(article, ArticleEntity.class)), Article.class);
+                ArticleEntity articleEntity = mapper.map(article, ArticleEntity.class);
+                articleEntity.setId(id); // Preserve the ID
+                return mapper.map(articleRepository.save(articleEntity), Article.class);
             }
             return null;
         }

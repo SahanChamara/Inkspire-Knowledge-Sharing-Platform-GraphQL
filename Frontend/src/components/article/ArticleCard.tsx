@@ -15,7 +15,7 @@ interface ArticleCardProps {
   };
   publishedAt: string;
   readTime: number;
-  tags: string[];
+  tags?: string[] | null;
   coverImage?: string;
 }
 
@@ -65,7 +65,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({
           </div>
         </div>
 
-        {tags.length > 0 && (
+        {tags && tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {tags.slice(0, 3).map((tag) => (
               <Badge key={tag}>{tag}</Badge>

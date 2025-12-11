@@ -8,7 +8,6 @@ import { RichTextEditor } from '../components/editor/RichTextEditor';
 import { Save, Eye, Send, X, Image as ImageIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { articleService } from '../lib/articles';
-import { notificationService } from '../lib/notifications';
 
 export const Editor: React.FC = () => {
   const { id } = useParams();
@@ -60,36 +59,23 @@ export const Editor: React.FC = () => {
   }, [title, content]);
 
   const handleAutoSave = async () => {
-    if (!profile || !title.trim()) return;
+    if (!profile || !title.trim() || !articleId) return;
 
     setSaving(true);
     try {
       const readTime = articleService.calculateReadTime(content);
       const excerpt = articleService.generateExcerpt(content);
 
-      if (articleId) {
-        await articleService.updateArticle(articleId, {
-          title,
-          content,
-          excerpt,
-          coverImageUrl,
-          tags,
-          status,
-          readTime: readTime,
-        });
-      } else {
-        const newArticle = await articleService.createArticle({
-          writerId: profile.id,
-          title,
-          content,
-          excerpt,
-          coverImageUrl,
-          tags,
-          status: "DRAFT",
-          readTime: readTime,
-        });
-        setArticleId(newArticle.id);
-      }
+      // Only update existing articles, don't create new ones on auto-save
+      await articleService.updateArticle(articleId, {
+        title,
+        content,
+        excerpt,
+        coverImageUrl,
+        tags,
+        status: status || 'DRAFT',
+        readTime: readTime,
+      });
       setLastSaved(new Date());
     } catch (error) {
       console.error('Error auto-saving:', error);
@@ -114,6 +100,7 @@ export const Editor: React.FC = () => {
 
       if (articleId) {
         await articleService.updateArticle(articleId, {
+          writerId: profile.id,
           title,
           content,
           excerpt,
@@ -134,6 +121,7 @@ export const Editor: React.FC = () => {
           readTime: readTime,
         });
         setArticleId(newArticle.id);
+        setStatus(newArticle.status || 'DRAFT');
       }
       setLastSaved(new Date());
       navigate('/dashboard');
@@ -161,20 +149,22 @@ export const Editor: React.FC = () => {
       const readTime = articleService.calculateReadTime(content);
       const excerpt = articleService.generateExcerpt(content);
 
-      let publishedArticleId = articleId;
-
       if (articleId) {
+        // Update existing article to DRAFT first to save latest changes
         await articleService.updateArticle(articleId, {
+          writerId: profile.id,
           title,
           content,
           excerpt,
           coverImageUrl,
           tags,
-          status: "PUBLISHED",
+          status: "DRAFT",
           readTime: readTime,
         });
+        // Then publish it
         await articleService.publishArticle(articleId);
       } else {
+        // Create article as DRAFT first
         const newArticle = await articleService.createArticle({
           writerId: profile.id,
           title,
@@ -182,20 +172,15 @@ export const Editor: React.FC = () => {
           excerpt,
           coverImageUrl,
           tags,
-          status: "PUBLISHED",
+          status: "DRAFT",
           readTime: readTime,
         });
-        publishedArticleId = newArticle.id;
+        // Then publish the article
         await articleService.publishArticle(newArticle.id);
+        setStatus('PUBLISHED');
       }
 
-      await notificationService.notifyFollowersOfNewArticle(
-        profile.id,
-        profile.name,
-        publishedArticleId!,
-        title
-      );
-
+      // Note: Followers notification is already handled in the backend's publishArticle method
       setPublishModalOpen(false);
       navigate('/dashboard');
     } catch (error) {

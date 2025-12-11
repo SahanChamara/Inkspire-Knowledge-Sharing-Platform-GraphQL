@@ -1,72 +1,32 @@
-import { supabase, Follow, Profile } from './supabase';
+import { Follow, Profile } from './supabase';
 
 export const followService = {
-  async followWriter(followerId: string, followingId: string): Promise<Follow> {
-    const { data, error } = await supabase
-      .from('follows')
-      .insert([{ follower_id: followerId, following_id: followingId }])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+  async followWriter(_followerId: string, _followingId: string): Promise<Follow> {
+    // Use GraphQL API: followWriter mutation
+    throw new Error('Use GraphQL API instead');
   },
 
-  async unfollowWriter(followerId: string, followingId: string): Promise<void> {
-    const { error } = await supabase
-      .from('follows')
-      .delete()
-      .eq('follower_id', followerId)
-      .eq('following_id', followingId);
-
-    if (error) throw error;
+  async unfollowWriter(_followerId: string, _followingId: string): Promise<void> {
+    // Use GraphQL API: unfollowWriter mutation
   },
 
-  async isFollowing(followerId: string, followingId: string): Promise<boolean> {
-    const { data, error } = await supabase
-      .from('follows')
-      .select('id')
-      .eq('follower_id', followerId)
-      .eq('following_id', followingId)
-      .maybeSingle();
-
-    if (error) throw error;
-    return !!data;
+  async isFollowing(_followerId: string, _followingId: string): Promise<boolean> {
+    // Use GraphQL API to check follow status
+    return false;
   },
 
-  async getFollowers(writerId: string): Promise<Profile[]> {
-    const { data, error } = await supabase
-      .from('follows')
-      .select(`
-        follower_id,
-        profiles!follows_follower_id_fkey (*)
-      `)
-      .eq('following_id', writerId);
-
-    if (error) throw error;
-    return (data || []).map((item: any) => item.profiles);
+  async getFollowers(_writerId: string): Promise<Profile[]> {
+    // Use GraphQL API: followers query
+    return [];
   },
 
-  async getFollowing(writerId: string): Promise<Profile[]> {
-    const { data, error } = await supabase
-      .from('follows')
-      .select(`
-        following_id,
-        profiles!follows_following_id_fkey (*)
-      `)
-      .eq('follower_id', writerId);
-
-    if (error) throw error;
-    return (data || []).map((item: any) => item.profiles);
+  async getFollowing(_writerId: string): Promise<Profile[]> {
+    // Use GraphQL API: following query
+    return [];
   },
 
-  async getFollowerIds(writerId: string): Promise<string[]> {
-    const { data, error } = await supabase
-      .from('follows')
-      .select('follower_id')
-      .eq('following_id', writerId);
-
-    if (error) throw error;
-    return (data || []).map(item => item.follower_id);
+  async getFollowerIds(_writerId: string): Promise<string[]> {
+    // Use GraphQL API: followers query
+    return [];
   },
 };

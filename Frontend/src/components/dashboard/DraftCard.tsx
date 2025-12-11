@@ -11,7 +11,7 @@ interface DraftCardProps {
   excerpt: string;
   lastEdited: string;
   status: 'DRAFT' | 'PUBLISHED' | 'REVIEW';
-  tags: string[];
+  tags?: string[] | null;
   onDelete: (id: string) => void;
 }
 
@@ -42,7 +42,7 @@ export const DraftCard: React.FC<DraftCardProps> = ({
         <Badge variant={statusVariants[status]}>{status}</Badge>
       </div>
 
-      {tags.length > 0 && (
+      {tags && tags.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {tags.map((tag) => (
             <Badge key={tag}>{tag}</Badge>

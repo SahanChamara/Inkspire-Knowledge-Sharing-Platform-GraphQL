@@ -1,5 +1,6 @@
 package io.github.SahanChamara.dto;
 
+import io.github.SahanChamara.util.ArticleStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ public class Article {
     private Long id;
     private String title;
     private String content;
-    private String status;
+    private ArticleStatus status;
     private Long writerId;
     private LocalDateTime publishedAt;
     private String excerpt;

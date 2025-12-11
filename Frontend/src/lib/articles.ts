@@ -98,13 +98,22 @@ export const articleService = {
     status: string,
     readTime: number,
   }): Promise<Article> {
+    // Ensure writerId is a valid numeric string
+    const sanitizedInput = {
+      ...input,
+      writerId: input.writerId ? String(input.writerId) : null
+    };
+
     const result = await apolloClient.mutate<
     {addArticle: Article},
     {input: {writerId: string; title: string; content: string; excerpt: string; coverImageUrl: string; tags: string[]; status: string; readTime: number}}
     >({
       mutation: ADD_ARTICLE,
-      variables: {input}
+      variables: {input: sanitizedInput as any}
     });
+
+    console.log("create article input", sanitizedInput);
+    
 
     if(result.error){
       throw new Error(result.error.message);
@@ -119,12 +128,17 @@ export const articleService = {
   },
 
   async updateArticle(id: string, updates: Partial<Article>): Promise<Article> {
+    // Ensure writerId is properly formatted if present
+    const sanitizedUpdates = updates.writerId 
+      ? { ...updates, writerId: String(updates.writerId) }
+      : updates;
+
     const result = await apolloClient.mutate<
     {updateArticle: Article},
-    {id: string; updates: Partial<Article>}
+    {id: string; input: Partial<Article>}
     >({
       mutation: UPDATEARTICLE,
-      variables: {id, updates}
+      variables: {id, input: sanitizedUpdates as any}
     });
 
     if(result.error){

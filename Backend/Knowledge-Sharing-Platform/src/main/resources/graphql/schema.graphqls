@@ -26,7 +26,7 @@ type Article {
     readTime: Int
     createdAt: String
     updatedAt: String
-    writer: Writer!
+    writer: Writer
 }
 
 type Notification {
@@ -59,7 +59,7 @@ type Query {
 input ArticleInput {
     title: String!
     content: String
-    writerId: ID!
+    writerId: String!
     status: String
     excerpt: String
     coverImageUrl: String

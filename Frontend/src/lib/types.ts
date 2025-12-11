@@ -7,7 +7,7 @@ export type Article = {
     publishedAt: string;
     excerpt: string;
     coverImageUrl: string;
-    tags: string[];
+    tags?: string[] | null;
     updatedAt: string;
     readTime: number;
     writer: Writer;
