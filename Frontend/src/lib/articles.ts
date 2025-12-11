@@ -166,6 +166,9 @@ export const articleService = {
       throw new Error(result.error.message);
     }
 
+    console.log("result", result);
+    
+
     const article: Article | undefined = result.data?.publishArticle;
     if(!article){
       throw new Error("Error Updating Article");

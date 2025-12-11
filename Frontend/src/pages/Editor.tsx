@@ -164,7 +164,7 @@ export const Editor: React.FC = () => {
         // Then publish it
         await articleService.publishArticle(articleId);
       } else {
-        // Create article as DRAFT first
+        // Create article directly as PUBLISHED so backend can persist and trigger notifications
         const newArticle = await articleService.createArticle({
           writerId: profile.id,
           title,
@@ -172,11 +172,11 @@ export const Editor: React.FC = () => {
           excerpt,
           coverImageUrl,
           tags,
-          status: "DRAFT",
+          status: "PUBLISHED",
           readTime: readTime,
         });
-        // Then publish the article
-        await articleService.publishArticle(newArticle.id);
+        // No separate publish call needed when created as PUBLISHED
+        setArticleId(newArticle.id);
         setStatus('PUBLISHED');
       }
 

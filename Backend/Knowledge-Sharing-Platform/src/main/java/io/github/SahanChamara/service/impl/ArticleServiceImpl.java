@@ -42,9 +42,31 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional
     public Article addArticle(Article article) {
-        if (article != null && article.getStatus().equals(ArticleStatus.DRAFT)) {
+        if (article == null) return null;
+
+        // If creating as DRAFT -> just save
+        if (article.getStatus() != null && article.getStatus().equals(ArticleStatus.DRAFT)) {
             return mapper.map(articleRepository.save(mapper.map(article, ArticleEntity.class)), Article.class);
         }
+
+        // If creating as PUBLISHED -> persist and run publish side-effects (notify followers)
+        if (article.getStatus() != null && article.getStatus().equals(ArticleStatus.PUBLISHED)) {
+            ArticleEntity entity = mapper.map(article, ArticleEntity.class);
+            entity.setPublishedAt(LocalDateTime.now(ZoneOffset.UTC));
+            ArticleEntity saved = articleRepository.save(entity);
+            Article dto = mapper.map(saved, Article.class);
+
+            // notify followers
+            List<Long> followerIdByFollowingId = followRepository.findFollowerIdByFollowingId(saved.getWriterId());
+            String payload = buildPayloadForArticle(saved);
+            for (Long recipientId : followerIdByFollowingId){
+                Notification articlePublished = notificationService.createNotification(recipientId, saved.getWriterId(), saved.getId(), "ARTICLE_PUBLISHED", payload);
+                notificationPublisher.publish(articlePublished);
+            }
+
+            return dto;
+        }
+
         return null;
     }
 
@@ -54,8 +76,9 @@ public class ArticleServiceImpl implements ArticleService {
         Integer isUpdated = articleRepository.updateStatus(id, "PUBLISHED", LocalDateTime.now(ZoneOffset.UTC));
 
         Optional<ArticleEntity> articleEntity = articleRepository.findById(id);
+        if (articleEntity.isEmpty()) return null;
         ArticleEntity article = articleEntity.get();
-        Article articleDto = mapper.map(articleEntity, Article.class);
+        Article articleDto = mapper.map(article, Article.class);
 //        articlePublisher.publish(article);
 
         if(isUpdated != 0){
@@ -175,16 +198,16 @@ public class ArticleServiceImpl implements ArticleService {
     //   This is helper method for clear structuring for notification payload
     @Override
     public String buildPayloadForArticle(ArticleEntity article) {
-        ArticleNotificationPayload payload = new ArticleNotificationPayload(
-                article.getId(),
-                article.getTitle(),
-                article.getWriterId(),
-                article.getPublishedAt()
-        );
+        // Serialize payload as primitives to avoid requiring jackson-datatype-jsr310 for LocalDateTime
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("id", article.getId());
+        payload.put("title", article.getTitle());
+        payload.put("writerId", article.getWriterId());
+        payload.put("publishedAt", article.getPublishedAt() != null ? article.getPublishedAt().toString() : null);
 
         try {
             return new ObjectMapper().writeValueAsString(payload);
-        }catch (JsonProcessingException processingException){
+        } catch (JsonProcessingException processingException) {
             throw new RuntimeException("Error Building Notification Payload", processingException);
         }
     }
