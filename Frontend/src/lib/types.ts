@@ -10,7 +10,7 @@ export type Article = {
     tags?: string[] | null;
     updatedAt: string;
     readTime: number;
-    writer: Writer;
+    writer?: Writer | null;
 }
 
 

@@ -25,4 +25,5 @@ public class Article {
     private Integer readTime;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Writer writer;
 }

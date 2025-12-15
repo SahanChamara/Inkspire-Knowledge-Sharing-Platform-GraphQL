@@ -15,7 +15,7 @@ import java.util.List;
 public interface ArticleRepository extends JpaRepository<ArticleEntity, Long> {
     List<ArticleEntity> findByWriterIdIn(Collection<Long> writerIds);
     List<ArticleEntity> findByWriterId(Long writerId);
-    List<ArticleEntity> findByStatus(String status);
+    List<ArticleEntity> findByStatus(ArticleStatus status);
 
     @Modifying
     @Transactional

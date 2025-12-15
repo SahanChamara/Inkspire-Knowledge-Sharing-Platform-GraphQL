@@ -43,10 +43,10 @@ export const Home: React.FC = () => {
     }
   } */
 
-  const allTags = Array.from(new Set(articles.flatMap((article) => article.tags)));
+  const allTags = Array.from(new Set(articles.flatMap((article) => article.tags ?? [])));
 
   const filteredArticles = selectedTag
-    ? articles.filter((article) => article.tags.includes(selectedTag))
+    ? articles.filter((article) => (article.tags ?? []).includes(selectedTag))
     : articles;
 
   return (
@@ -90,8 +90,8 @@ export const Home: React.FC = () => {
               id={article.id}
               title={article.title}
               excerpt={article.excerpt || articleService.generateExcerpt(article.content)}
-              author={{ id: article.writer.id, name: article.writer.name }}
-              publishedAt={article.publishedAt!}
+              author={{ id: article.writer?.id ?? '', name: article.writer?.name ?? 'Unknown' }}
+              publishedAt={article.publishedAt ?? new Date().toISOString()}
               readTime={article.readTime}
               tags={article.tags}
               coverImage={article.coverImageUrl || undefined}

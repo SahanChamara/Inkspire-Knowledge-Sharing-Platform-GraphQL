@@ -4,6 +4,7 @@ import io.github.SahanChamara.dto.Article;
 import io.github.SahanChamara.dto.Writer;
 import io.github.SahanChamara.publisher.ArticlePublisher;
 import io.github.SahanChamara.service.ArticleService;
+import io.github.SahanChamara.util.ArticleStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -34,8 +35,8 @@ public class ArticleController {
         logger.debug("Cover Image Url: {}", articleInput.getCoverImageUrl());
 
         return articleService.addArticle(new Article(null, articleInput.getTitle(),
-                articleInput.getContent(), articleInput.getStatus(), articleInput.getWriterId(),articleInput.getPublishedAt(), articleInput.getExcerpt(), articleInput.getCoverImageUrl(),
-                articleInput.getTags(), articleInput.getReadTime(), LocalDateTime.now(), LocalDateTime.now()));
+            articleInput.getContent(), articleInput.getStatus(), articleInput.getWriterId(),articleInput.getPublishedAt(), articleInput.getExcerpt(), articleInput.getCoverImageUrl(),
+            articleInput.getTags(), articleInput.getReadTime(), LocalDateTime.now(), LocalDateTime.now(), null));
 
     }
 
@@ -47,8 +48,8 @@ public class ArticleController {
     @MutationMapping
     public Article updateArticle(@Argument Long id, @Argument("input") Article articleInput){
         return articleService.updateArticle(id, new Article(null,articleInput.getTitle(),
-                articleInput.getContent(), articleInput.getStatus(), articleInput.getWriterId(), articleInput.getPublishedAt(), articleInput.getExcerpt(), articleInput.getCoverImageUrl(),
-                articleInput.getTags(), articleInput.getReadTime(), articleInput.getCreatedAt(), LocalDateTime.now()));
+            articleInput.getContent(), articleInput.getStatus(), articleInput.getWriterId(), articleInput.getPublishedAt(), articleInput.getExcerpt(), articleInput.getCoverImageUrl(),
+            articleInput.getTags(), articleInput.getReadTime(), articleInput.getCreatedAt(), LocalDateTime.now(), null));
     }
 
     @MutationMapping
@@ -78,7 +79,16 @@ public class ArticleController {
 
     @QueryMapping
     public List<Article> articles(@Argument Optional<String> status){
-        return articleService.getAllArticles(status.orElse(null));
+        ArticleStatus articleStatus = null;
+        if (status.isPresent()){
+            try{
+                articleStatus = ArticleStatus.valueOf(status.get());
+            } catch (IllegalArgumentException ex){
+                logger.warn("Unknown article status filter: {}", status.get());
+                articleStatus = null;
+            }
+        }
+        return articleService.getAllArticles(articleStatus);
     }
 
     @BatchMapping(typeName = "Writer", field = "articles")
@@ -90,7 +100,14 @@ public class ArticleController {
 
     @BatchMapping(typeName = "Article", field = "writer")
     public Map<Long, Writer> writer(List<Article> articles){
-        return articleService.getWriterByArticles(articles);
+        // articleService.getWriterByArticles returns a map keyed by writerId -> Writer
+        // GraphQL BatchMapping for Article.writer expects a map keyed by the ARTICLE id -> Writer
+        Map<Long, Writer> writersByWriterId = articleService.getWriterByArticles(articles);
+        Map<Long, Writer> result = new java.util.HashMap<>();
+        for (Article a : articles) {
+            result.put(a.getId(), writersByWriterId.get(a.getWriterId()));
+        }
+        return result;
     }
 
     @SubscriptionMapping
