@@ -99,13 +99,15 @@ public class ArticleController {
     }
 
     @BatchMapping(typeName = "Article", field = "writer")
-    public Map<Long, Writer> writer(List<Article> articles){
-        // articleService.getWriterByArticles returns a map keyed by writerId -> Writer
-        // GraphQL BatchMapping for Article.writer expects a map keyed by the ARTICLE id -> Writer
+    public Map<Article, Writer> writer(List<Article> articles){
+        // GraphQL BatchMapping for Article.writer expects a map keyed by Article object -> Writer
         Map<Long, Writer> writersByWriterId = articleService.getWriterByArticles(articles);
-        Map<Long, Writer> result = new java.util.HashMap<>();
+        Map<Article, Writer> result = new java.util.HashMap<>();
         for (Article a : articles) {
-            result.put(a.getId(), writersByWriterId.get(a.getWriterId()));
+            Writer writer = writersByWriterId.get(a.getWriterId());
+            if (writer != null) {
+                result.put(a, writer);
+            }
         }
         return result;
     }
