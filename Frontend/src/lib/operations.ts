@@ -81,18 +81,10 @@ export const GET_ARTICLES = gql`
 export const GET_ARTICLE_BY_ID = gql`
     query GetArticleById($id: ID!){
         articleById(id: $id){
-            id
-            title
-            content
-            status
-            writerId
-            publishAt
-            excerpt
-            coverImageUrl
-            tags
-            readTime
+            ...ArticleFields
         }
     }
+    ${ARTICLE_FRAGMENT}
 `
 
 export const GET_ARTICLES_BY_WRITER = gql`

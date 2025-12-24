@@ -9,13 +9,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { articleService } from '../lib/articles';
 import { followService } from '../lib/follows';
 import { ArticleWithWriter } from '../lib/supabase';
+import { Article } from '../lib/types';
 
 export const ArticleDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { profile } = useAuth();
-  const [article, setArticle] = useState<ArticleWithWriter | null>(null);
-  const [relatedArticles, setRelatedArticles] = useState<ArticleWithWriter[]>([]);
+  const [article, setArticle] = useState<Article | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
   const [bookmarked, setBookmarked] = useState(false);
   const [liked, setLiked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -40,8 +41,8 @@ export const ArticleDetail: React.FC = () => {
 
       setArticle(articleData);
 
-      if (profile && articleData.profiles.id !== profile.id) {
-        const following = await followService.isFollowing(profile.id, articleData.profiles.id);
+      if (profile && articleData.writerId !== profile.id) {
+        const following = await followService.isFollowing(profile.id, articleData.writerId);
         setIsFollowing(following);
       }
 
@@ -62,10 +63,10 @@ export const ArticleDetail: React.FC = () => {
 
     try {
       if (isFollowing) {
-        await followService.unfollowWriter(profile.id, article.profiles.id);
+        await followService.unfollowWriter(profile.id, article.writerId);
         setIsFollowing(false);
       } else {
-        await followService.followWriter(profile.id, article.profiles.id);
+        await followService.followWriter(profile.id, article.writerId);
         setIsFollowing(true);
       }
     } catch (error) {
@@ -94,15 +95,15 @@ export const ArticleDetail: React.FC = () => {
     );
   }
 
-  const isOwnArticle = profile?.id === article.profiles.id;
+  const isOwnArticle = profile?.id === article.writerId;
 
   return (
     <PageLayout maxWidth="lg">
       <article className="mb-12">
-        {article.cover_image && (
+        {article.coverImageUrl && (
           <div className="w-full h-96 rounded-2xl overflow-hidden mb-8">
             <img
-              src={article.cover_image}
+              src={article.coverImageUrl}
               alt={article.title}
               className="w-full h-full object-cover"
             />
@@ -120,22 +121,22 @@ export const ArticleDetail: React.FC = () => {
         <div className="flex items-center justify-between mb-8 pb-8 border-b border-gray-200">
           <div
             className="flex items-center gap-4 cursor-pointer hover:opacity-80"
-            onClick={() => navigate(`/profile/${article.profiles.id}`)}
+            onClick={() => navigate(`/profile/${article.writerId}`)}
           >
             <div className="w-12 h-12 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
               <User size={24} className="text-white" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">{article.profiles.name}</p>
+              <p className="font-semibold text-gray-900">{article.writer?.name}</p>
               <div className="flex items-center gap-3 text-sm text-gray-500">
                 <div className="flex items-center gap-1">
                   <Calendar size={14} />
-                  <span>{new Date(article.published_at!).toLocaleDateString()}</span>
+                  <span>{new Date(article.publishedAt!).toLocaleDateString()}</span>
                 </div>
                 <span>•</span>
                 <div className="flex items-center gap-1">
                   <Clock size={14} />
-                  <span>{article.read_time} min read</span>
+                  <span>{article.readTime} min read</span>
                 </div>
               </div>
             </div>
@@ -166,7 +167,7 @@ export const ArticleDetail: React.FC = () => {
           <div className="flex flex-col items-center text-center">
             <div
               className="w-20 h-20 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center mb-4 cursor-pointer hover:opacity-80"
-              onClick={() => navigate(`/profile/${article.profiles.id}`)}
+              onClick={() => navigate(`/profile/${article.writerId}`)}
             >
               <User size={32} className="text-white" />
             </div>
@@ -174,16 +175,16 @@ export const ArticleDetail: React.FC = () => {
               className="font-semibold text-gray-900 mb-2 cursor-pointer hover:text-teal-600"
               onClick={() => navigate(`/profile/${article.profiles.id}`)}
             >
-              {article.profiles.name}
+              {article.writer.name}
             </h4>
-            <p className="text-sm text-gray-600 mb-4">{article.profiles.bio}</p>
+            <p className="text-sm text-gray-600 mb-4">{article.writer?.bio}</p>
             <div className="flex gap-6 mb-4 text-sm">
               <div className="text-center">
-                <p className="font-bold text-gray-900">{article.profiles.follower_count}</p>
+                <p className="font-bold text-gray-900">{article.writer?.followersCount}</p>
                 <p className="text-gray-600">Followers</p>
               </div>
               <div className="text-center">
-                <p className="font-bold text-gray-900">{article.profiles.article_count}</p>
+                <p className="font-bold text-gray-900">{article.writer?.articleCount}</p>
                 <p className="text-gray-600">Articles</p>
               </div>
             </div>
@@ -208,9 +209,9 @@ export const ArticleDetail: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {relatedArticles.map((relatedArticle) => (
                 <Card key={relatedArticle.id} onClick={() => navigate(`/article/${relatedArticle.id}`)}>
-                  {relatedArticle.cover_image && (
+                  {relatedArticle.coverImageUrl && (
                     <img
-                      src={relatedArticle.cover_image}
+                      src={relatedArticle.coverImageUrl}
                       alt={relatedArticle.title}
                       className="w-full h-40 object-cover"
                     />
@@ -220,10 +221,10 @@ export const ArticleDetail: React.FC = () => {
                       {relatedArticle.title}
                     </h4>
                     <div className="flex items-center justify-between text-sm text-gray-500">
-                      <span>{relatedArticle.profiles.name}</span>
+                      <span>{relatedArticle.writer.name}</span>
                       <div className="flex items-center gap-1">
                         <Clock size={14} />
-                        <span>{relatedArticle.read_time} min</span>
+                        <span>{relatedArticle.readTime} min</span>
                       </div>
                     </div>
                   </div>

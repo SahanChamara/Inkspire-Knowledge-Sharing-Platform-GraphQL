@@ -62,7 +62,7 @@ public class ArticleServiceImpl implements ArticleService {
             // notify followers
             List<Long> followerIdByFollowingId = followRepository.findFollowerIdByFollowingId(saved.getWriterId());
             String payload = buildPayloadForArticle(saved);
-            for (Long recipientId : followerIdByFollowingId){
+            for (Long recipientId : followerIdByFollowingId) {
                 Notification articlePublished = notificationService.createNotification(recipientId, saved.getWriterId(), saved.getId(), "ARTICLE_PUBLISHED", payload);
                 notificationPublisher.publish(articlePublished);
             }
@@ -85,10 +85,10 @@ public class ArticleServiceImpl implements ArticleService {
         writerRepository.findById(article.getWriterId()).ifPresent(w -> articleDto.setWriter(mapper.map(w, Writer.class)));
 //        articlePublisher.publish(article);
 
-        if(isUpdated != 0){
+        if (isUpdated != 0) {
             List<Long> followerIdByFollowingId = followRepository.findFollowerIdByFollowingId(article.getWriterId());
             String payload = buildPayloadForArticle(articleEntity.get());
-            for (Long recipientId : followerIdByFollowingId){
+            for (Long recipientId : followerIdByFollowingId) {
                 Notification articlePublished = notificationService.createNotification(recipientId, article.getWriterId(), articleEntity.get().getId(), "ARTICLE_PUBLISHED", payload);
                 notificationPublisher.publish(articlePublished);
             }
@@ -103,34 +103,34 @@ public class ArticleServiceImpl implements ArticleService {
                 ? articleRepository.findAll()
                 : articleRepository.findByStatus(status);
         List<Article> dtos = articles.stream()
-            .map(articleEntity -> mapper.map(articleEntity, Article.class))
-            .toList();
+                .map(articleEntity -> mapper.map(articleEntity, Article.class))
+                .toList();
 
         attachWriters(dtos);
         return dtos;
     }
 
-        /**
-         * Populate `writer` field on each Article DTO using a single batch query
-         */
-        private void attachWriters(List<Article> articles){
-        if(articles == null || articles.isEmpty()) return;
+    /**
+     * Populate `writer` field on each Article DTO using a single batch query
+     */
+    private void attachWriters(List<Article> articles) {
+        if (articles == null || articles.isEmpty()) return;
         List<Long> writerIds = articles.stream()
-            .map(Article::getWriterId)
-            .filter(Objects::nonNull)
-            .distinct()
-            .toList();
-        if(writerIds.isEmpty()) return;
+                .map(Article::getWriterId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        if (writerIds.isEmpty()) return;
 
         List<WriterEntity> writerEntities = writerRepository.findByIdIn(writerIds);
         Map<Long, Writer> map = writerEntities.stream()
-            .map(w -> mapper.map(w, Writer.class))
-            .collect(Collectors.toMap(Writer::getId, w -> w));
+                .map(w -> mapper.map(w, Writer.class))
+                .collect(Collectors.toMap(Writer::getId, w -> w));
 
-        for(Article a : articles){
+        for (Article a : articles) {
             a.setWriter(map.get(a.getWriterId()));
         }
-        }
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -146,9 +146,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional
     public List<Article> articlesByWriter(Long writerId) {
         List<Article> dtos = articleRepository.findByWriterId(writerId)
-            .stream()
-            .map(articleEntity -> mapper.map(articleEntity, Article.class))
-            .toList();
+                .stream()
+                .map(articleEntity -> mapper.map(articleEntity, Article.class))
+                .toList();
         attachWriters(dtos);
         return dtos;
     }
@@ -157,9 +157,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional
     public List<Article> draftsByWriter(Long writerId) {
         List<Article> dtos = articleRepository.findByWriterIdAndStatus(writerId, ArticleStatus.DRAFT)
-            .stream()
-            .map(articleEntity -> mapper.map(articleEntity, Article.class))
-            .toList();
+                .stream()
+                .map(articleEntity -> mapper.map(articleEntity, Article.class))
+                .toList();
         attachWriters(dtos);
         return dtos;
     }
@@ -168,9 +168,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional
     public List<Article> publishedByWriter(Long writerId) {
         List<Article> dtos = articleRepository.findByWriterIdAndStatus(writerId, ArticleStatus.PUBLISHED)
-            .stream()
-            .map(articleEntity -> mapper.map(articleEntity, Article.class))
-            .toList();
+                .stream()
+                .map(articleEntity -> mapper.map(articleEntity, Article.class))
+                .toList();
         attachWriters(dtos);
         return dtos;
     }
@@ -223,7 +223,7 @@ public class ArticleServiceImpl implements ArticleService {
                 .distinct()
                 .toList();
 
-        if(writerIds.isEmpty()){
+        if (writerIds.isEmpty()) {
             return Collections.emptyMap();
         }
 
