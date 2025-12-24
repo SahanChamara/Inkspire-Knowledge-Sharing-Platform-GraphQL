@@ -1,17 +1,42 @@
+import { apolloClient } from './apllo';
+import { FOLLOW_WRITER, UNFOLLOW_WRITER } from './operations';
 import { Follow, Profile } from './supabase';
 
 export const followService = {
-  async followWriter(_followerId: string, _followingId: string): Promise<Follow> {
-    // Use GraphQL API: followWriter mutation
-    throw new Error('Use GraphQL API instead');
+  async followWriter(followerId: string, targetId: string): Promise<boolean> {
+    const result = await apolloClient.mutate<
+      { followWriter: boolean },
+      { targetId: string; followerId: string }
+    >({
+      mutation: FOLLOW_WRITER,
+      variables: { targetId, followerId },
+    });
+
+    if (result.errors) {
+      throw new Error(result.errors[0].message);
+    }
+
+    return result.data?.followWriter ?? false;
   },
 
-  async unfollowWriter(_followerId: string, _followingId: string): Promise<void> {
-    // Use GraphQL API: unfollowWriter mutation
+  async unfollowWriter(followerId: string, targetId: string): Promise<boolean> {
+    const result = await apolloClient.mutate<
+      { unfollowWriter: boolean },
+      { targetId: string; followerId: string }
+    >({
+      mutation: UNFOLLOW_WRITER,
+      variables: { targetId, followerId },
+    });
+
+    if (result.errors) {
+      throw new Error(result.errors[0].message);
+    }
+
+    return result.data?.unfollowWriter ?? false;
   },
 
   async isFollowing(_followerId: string, _followingId: string): Promise<boolean> {
-    // Use GraphQL API to check follow status
+    // Use GraphQL API to check follow status via Writer.isFollowedBy field
     return false;
   },
 

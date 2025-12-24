@@ -11,18 +11,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "follow", uniqueConstraints = @UniqueConstraint(columnNames = {"follower_id", "FOLLOWING_ID"}))
+@Table(name = "follow", uniqueConstraints = @UniqueConstraint(columnNames = {"follower_id", "following_id"}))
 public class FollowEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "followId")
+    @Column(name = "follower_id")
     private Long followerId;
 
-    @Column(name = "followingId")
+    @Column(name = "following_id")
     private Long followingId;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 }

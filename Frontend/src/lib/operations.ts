@@ -60,7 +60,11 @@ export const GET_WRITER = gql`
             id
             name
             bio
+            email
+            avatarUrl
             followersCount
+            articleCount
+            isFollowedBy(meId: $meId)
             articles {
                 ...ArticleFields
             }

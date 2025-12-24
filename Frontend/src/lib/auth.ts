@@ -45,13 +45,13 @@ export const authService = {
     localStorage.clear();
   },
 
-  async getProfileById(profileId: string): Promise<Writer | null> {
+  async getProfileById(profileId: string, meId?: string): Promise<Writer | null> {
     const result = await apolloClient.query<
       { getWriterById: Writer | null },
-      { id: string }
+      { id: string; meId?: string }
     >({
       query: GET_WRITER,
-      variables: { id: profileId },
+      variables: { id: profileId, meId },
       fetchPolicy: "network-only",
     });
 

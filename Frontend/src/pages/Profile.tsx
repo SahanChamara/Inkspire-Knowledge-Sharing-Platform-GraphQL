@@ -36,16 +36,16 @@ export const Profile: React.FC = () => {
 
     setLoading(true);
     try {
-      const profileData = await authService.getProfileById(id);
+      const profileData = await authService.getProfileById(id, currentProfile?.id);
       setProfile(profileData);
 
       if (profileData) {
         const articlesData = await articleService.getPublishedByWriter(id);
         setArticles(articlesData);
 
-        if (currentProfile && !isOwnProfile) {
-          const following = await followService.isFollowing(currentProfile.id, id);
-          setIsFollowing(following);
+        // Use the isFollowedBy field from the profile data
+        if (currentProfile && !isOwnProfile && profileData.isFollowedByMe !== undefined) {
+          setIsFollowing(profileData.isFollowedByMe);
         }
       }
     } catch (error) {
@@ -146,18 +146,18 @@ export const Profile: React.FC = () => {
               <div className="flex flex-wrap gap-6 text-sm">
                 <div className="flex items-center gap-2">
                   <FileText size={16} className="text-gray-500" />
-                  <span className="font-semibold text-gray-900">{profile.article_count}</span>
+                  <span className="font-semibold text-gray-900">{profile.articleCount || 0}</span>
                   <span className="text-gray-600">Articles</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users size={16} className="text-gray-500" />
-                  <span className="font-semibold text-gray-900">{profile.follower_count}</span>
+                  <span className="font-semibold text-gray-900">{profile.followersCount || 0}</span>
                   <span className="text-gray-600">Followers</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar size={16} className="text-gray-500" />
                   <span className="text-gray-600">
-                    Joined {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    Joined {new Date(profile.created_at || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                   </span>
                 </div>
               </div>

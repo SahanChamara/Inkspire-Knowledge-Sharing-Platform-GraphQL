@@ -67,7 +67,7 @@ public class FollowServiceImpl implements FollowService {
     @Override
     @Transactional(readOnly = true)
     public List<Writer> getFollowing(Long followerId) {
-        List<FollowEntity> byFollowerId = followRepository.findByFollowingId(followerId);
+        List<FollowEntity> byFollowerId = followRepository.findByFollowerId(followerId);
         List<Long> idList = byFollowerId.stream()
                 .map(FollowEntity::getFollowingId)
                 .toList();

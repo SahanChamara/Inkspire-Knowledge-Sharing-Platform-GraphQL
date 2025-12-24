@@ -1,6 +1,7 @@
 package io.github.SahanChamara.controller;
 
 import io.github.SahanChamara.dto.Writer;
+import io.github.SahanChamara.service.FollowService;
 import io.github.SahanChamara.service.WriterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,14 +9,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ import java.util.List;
 public class WriterController {
 
     private final WriterService writerService;
+    private final FollowService followService;
     private static final Logger logger = LoggerFactory.getLogger(WriterController.class);
 
     @MutationMapping()
@@ -57,5 +61,25 @@ public class WriterController {
             return writerService.getWriterById(id);
         }
         return null;
+    }
+
+    @SchemaMapping(typeName = "Writer", field = "isFollowedBy")
+    public Boolean isFollowedBy(Writer writer, @Argument Long meId) {
+        if (meId == null || writer.getId() == null) {
+            return false;
+        }
+        return followService.isFollowing(meId, writer.getId());
+    }
+
+    @BatchMapping(typeName = "Writer", field = "followersCount")
+    public Map<Writer, Long> followersCount(List<Writer> writers) {
+        List<Long> writerIds = writers.stream().map(Writer::getId).toList();
+        Map<Long, Long> countsById = followService.getFollowersCountFor(writerIds);
+        
+        Map<Writer, Long> result = new java.util.HashMap<>();
+        for (Writer writer : writers) {
+            result.put(writer, countsById.getOrDefault(writer.getId(), 0L));
+        }
+        return result;
     }
 }

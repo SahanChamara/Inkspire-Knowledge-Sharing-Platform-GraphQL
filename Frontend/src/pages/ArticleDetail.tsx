@@ -10,6 +10,7 @@ import { articleService } from '../lib/articles';
 import { followService } from '../lib/follows';
 import { ArticleWithWriter } from '../lib/supabase';
 import { Article } from '../lib/types';
+import { authService } from '../lib/auth';
 
 export const ArticleDetail: React.FC = () => {
   const { id } = useParams();
@@ -41,14 +42,21 @@ export const ArticleDetail: React.FC = () => {
 
       setArticle(articleData);
 
-      if (profile && articleData.writerId !== profile.id) {
-        const following = await followService.isFollowing(profile.id, articleData.writerId);
-        setIsFollowing(following);
+      // Check if writer has isFollowedBy information (requires fetching writer separately with meId)
+      if (profile && articleData.writerId && articleData.writerId !== profile.id) {
+        const writerData = await authService.getProfileById(articleData.writerId, profile.id);
+        if (writerData?.isFollowedByMe !== undefined) {
+          setIsFollowing(writerData.isFollowedByMe);
+        }
+        // Update article with full writer data including follower counts
+        if (writerData) {
+          setArticle({ ...articleData, writer: writerData });
+        }
       }
 
-      const allArticles = await articleService.getPublishedArticles(null);
+      const allArticles = await articleService.getPublishedArticles("PUBLISHED");
       const related = allArticles
-        .filter((a) => a.id !== id && a.tags.some((tag) => articleData.tags.includes(tag)))
+        .filter((a) => a.id !== id && a.tags && articleData.tags && a.tags.some((tag) => articleData.tags?.includes(tag)))
         .slice(0, 2);
       setRelatedArticles(related);
     } catch (error) {
@@ -111,7 +119,7 @@ export const ArticleDetail: React.FC = () => {
         )}
 
         <div className="flex flex-wrap gap-2 mb-6">
-          {article.tags.map((tag) => (
+          {article.tags && article.tags.map((tag) => (
             <Badge key={tag}>{tag}</Badge>
           ))}
         </div>
@@ -173,11 +181,11 @@ export const ArticleDetail: React.FC = () => {
             </div>
             <h4
               className="font-semibold text-gray-900 mb-2 cursor-pointer hover:text-teal-600"
-              onClick={() => navigate(`/profile/${article.profiles.id}`)}
+              onClick={() => navigate(`/profile/${article.writerId}`)}
             >
-              {article.writer.name}
+              {article.writer?.name || 'Unknown'}
             </h4>
-            <p className="text-sm text-gray-600 mb-4">{article.writer?.bio}</p>
+            <p className="text-sm text-gray-600 mb-4">{article.writer?.bio || 'No bio available'}</p>
             <div className="flex gap-6 mb-4 text-sm">
               <div className="text-center">
                 <p className="font-bold text-gray-900">{article.writer?.followersCount}</p>
