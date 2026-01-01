@@ -4,7 +4,13 @@ type Writer {
     id: ID!
     name: String!
     bio: String
+    email: String
+    password: String
     articles: [Article!]!
+    followersCount: Int
+    avatarUrl: String
+    articleCount: Int
+    isFollowedBy(meId: ID): Boolean
 }
 
 type Article {
@@ -14,6 +20,24 @@ type Article {
     status: String!
     writerId: ID!
     publishedAt: String
+    excerpt: String
+    coverImageUrl: String
+    tags: [String]
+    readTime: Int
+    createdAt: String
+    updatedAt: String
+    writer: Writer
+}
+
+type Notification {
+    id: ID!
+    recipientId: ID!
+    actorId: ID!
+    articleId: ID!
+    type: String
+    payload: String
+    readFlag: Boolean!
+    createdAt: String
 }
 
 # This is Queries..this is use to GET
@@ -22,30 +46,49 @@ type Query {
     getWriterById(id: ID!): Writer
     articles(status: String): [Article!]!
     articleById(id: ID!): Article
+    articlesByWriter(writerId: ID!): [Article!]!
+    draftsByWriter(writerId: ID!): [Article!]!
+    publishedByWriter(writerId: ID!): [Article!]!
+    followers(writerId: ID!): [Writer!]!
+    following(followerId: ID!): [Writer!]!
+    notifications(recipientId: ID!): [Notification!]!
+    unreadNotificationCount(recipientId: ID!): Int!
 }
 
 # This is Inputs...this we used to define a Mutation
 input ArticleInput {
     title: String!
     content: String
-    writerId: ID!
+    writerId: String!
     status: String
+    excerpt: String
+    coverImageUrl: String
+    tags: [String]
+    readTime: Int
 }
 
 input WriterInput {
     name: String
     bio: String
+    email: String
+    password: String
+    avatarUrl: String
 }
 
 # This is Mutation..this we use to POST
 type Mutation {
-    addWriter(input: WriterInput!): Writer!
+    logInOrSignUpWriter(input: WriterInput!): Writer!
+    followWriter(targetId: ID!, followerId: ID!): Boolean!
+    unfollowWriter(targetId: ID!, followerId: ID!): Boolean!
+    updateWriter(id: ID!, input: WriterInput!): Writer
     addArticle(input: ArticleInput!): Article!
     publishArticle(id: ID!): Article
     updateArticle(id: ID!, input: ArticleInput!): Article
     deleteArticle(id: ID!): Boolean!
+    markNotificationRead(notificationId: ID!): Boolean!
 }
 
 type Subscription {
     articlePublished: Article!
+    notificationAdded(recipientId: ID!): Notification!
 }
